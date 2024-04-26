@@ -82,11 +82,12 @@ export async function removeLiquidity(
   console.log('status: ', status);
   events.map((l) => {
     const data = l.data;
-    console.log(data);
     if (data.startsWith('WITHDRAWN_FROM_BIN:')) {
       console.log('WITHDRAWN_FROM_BIN: ', EventDecoder.decodeLiquidity(data));
     } else if (data.startsWith('FEES_COLLECTED:')) {
       console.log('FEES_COLLECTED', EventDecoder.decodeCollectFees(data));
+    } else {
+      console.log(data);
     }
   });
 }

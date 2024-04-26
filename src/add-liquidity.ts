@@ -90,13 +90,12 @@ export async function addLiquidity(
   console.log('status: ', status);
   events.map((l) => {
     const data = l.data;
-    console.log(data);
     if (data.startsWith('COMPOSITION_FEE:')) {
-      console.log(
-        `COMPOSITION_FEE: ${EventDecoder.decodeCompositionFee(data)}`,
-      );
+      console.log('COMPOSITION_FEE: ', EventDecoder.decodeCompositionFee(data));
     } else if (data.startsWith('DEPOSITED_TO_BIN:')) {
       console.log('DEPOSITED_TO_BIN: ', EventDecoder.decodeLiquidity(data));
+    } else {
+      console.log(data);
     }
   });
 }

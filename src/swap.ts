@@ -180,9 +180,10 @@ export async function swap(
   console.log('status: ', status);
   events.map((l) => {
     const data = l.data;
-    console.log(data);
     if (data.startsWith('SWAP:')) {
       console.log('SWAP: ', EventDecoder.decodeSwap(data));
+    } else {
+      console.log(data);
     }
   });
 }
