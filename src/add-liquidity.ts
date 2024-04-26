@@ -90,11 +90,20 @@ export async function addLiquidity(
   console.log('status: ', status);
   events.map((l) => {
     const data = l.data;
-    if (data.startsWith('COMPOSITION_FEE:'))
-      console.log(EventDecoder.decodeCompositionFee(data));
-    else if (data.startsWith('DEPOSITED_TO_BIN:'))
-      console.log(EventDecoder.decodeLiquidity(data));
-    else console.log(data);
+    console.log(data);
+    if (data.startsWith('COMPOSITION_FEE:')) {
+      console.log(
+        `COMPOSITION_FEE: ${JSON.stringify(
+          EventDecoder.decodeCompositionFee(data),
+        )}`,
+      );
+    } else if (data.startsWith('DEPOSITED_TO_BIN:')) {
+      console.log(
+        `DEPOSITED_TO_BIN: ${JSON.stringify(
+          EventDecoder.decodeLiquidity(data),
+        )}`,
+      );
+    }
   });
 }
 
@@ -104,7 +113,7 @@ async function main() {
   const tokenAmount1 = new TokenAmount(USDC, parseUnits('10', USDC.decimals));
   const tokenAmount2 = new TokenAmount(WMAS, parseUnits('100', WMAS.decimals));
   const pair = new PairV2(USDC, WMAS);
-  const binStep = PAIR_TO_BIN_STEP['MAS-USDC'];
+  const binStep = PAIR_TO_BIN_STEP['WMAS-USDC'];
 
   await addLiquidity(
     binStep,

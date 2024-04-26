@@ -82,11 +82,20 @@ export async function removeLiquidity(
   console.log('status: ', status);
   events.map((l) => {
     const data = l.data;
-    if (data.startsWith('WITHDRAWN_FROM_BIN:'))
-      console.log(EventDecoder.decodeLiquidity(data));
-    else if (data.startsWith('FEES_COLLECTED:'))
-      console.log(EventDecoder.decodeCollectFees(data));
-    else console.log(data);
+    console.log(data);
+    if (data.startsWith('WITHDRAWN_FROM_BIN:')) {
+      console.log(
+        `WITHDRAWN_FROM_BIN: ${JSON.stringify(
+          EventDecoder.decodeLiquidity(data),
+        )}`,
+      );
+    } else if (data.startsWith('FEES_COLLECTED:')) {
+      console.log(
+        `FEES_COLLECTED: ${JSON.stringify(
+          EventDecoder.decodeCollectFees(data),
+        )}`,
+      );
+    }
   });
 }
 
@@ -94,7 +103,7 @@ async function main() {
   const { client, account } = await getClient(process.env.WALLET_SECRET_KEY!);
 
   const pair = new PairV2(USDC, WMAS);
-  const binStep = PAIR_TO_BIN_STEP['MAS-USDC'];
+  const binStep = PAIR_TO_BIN_STEP['WMAS-USDC'];
 
   const { activeBinId, pairContract, userPositionIds } = await getBinsData(
     binStep,

@@ -138,7 +138,7 @@ export async function swap(
   const bestTrade = TradeV2.chooseBestTrade(trades, isExactIn);
 
   // print useful information about the trade, such as the quote, executionPrice, fees, etc
-  console.log(bestTrade.toLog());
+  // console.log(bestTrade.toLog());
 
   // get trade fee information
   const { totalFeePct, feeAmountIn } = bestTrade.getTradeFee();
@@ -180,8 +180,10 @@ export async function swap(
   console.log('status: ', status);
   events.map((l) => {
     const data = l.data;
-    if (data.startsWith('SWAP:')) console.log(EventDecoder.decodeSwap(data));
-    else console.log(data);
+    console.log(data);
+    if (data.startsWith('SWAP:')) {
+      console.log(`SWAP: ${JSON.stringify(EventDecoder.decodeSwap(data))}`);
+    }
   });
 }
 
