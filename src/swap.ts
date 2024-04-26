@@ -182,7 +182,7 @@ export async function swap(
     const data = l.data;
     console.log(data);
     if (data.startsWith('SWAP:')) {
-      console.log(`SWAP: ${JSON.stringify(EventDecoder.decodeSwap(data))}`);
+      console.log(`SWAP: ${EventDecoder.decodeSwap(data)}`);
     }
   });
 }
