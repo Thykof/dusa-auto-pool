@@ -106,11 +106,12 @@ async function main() {
 
   const interval = 1000 * 60 * 10;
 
-  setInterval(async () => {
-    const pair = new PairV2(USDC, WMAS);
-    const binStep = PAIR_TO_BIN_STEP['WMAS-USDC'];
-    await autoLiquidity(binStep, client, account, pair);
-  }, interval);
+  // For now it won't work with multiple pairs that have token in common
+  // setInterval(async () => {
+  //   const pair = new PairV2(USDC, WMAS);
+  //   const binStep = PAIR_TO_BIN_STEP['WMAS-USDC'];
+  //   await autoLiquidity(binStep, client, account, pair);
+  // }, interval);
 
   setInterval(async () => {
     const pair = new PairV2(WETH, WMAS);

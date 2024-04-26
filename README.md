@@ -10,7 +10,7 @@ If you want to stake with your own node, you can use this https://github.com/pet
 
 This program is a bot that automatically balance the liquidity to the Dusa pool.
 
-You must have WMAS and USCD in a same ratio, and WMAS and WETH in a same ratio.
+You must have WMAS and WETH in a same ratio.
 
 The bot will add 95% of your tokens to the liquidity pool, and check every 10 minutes if the pool is unbalanced.
 
