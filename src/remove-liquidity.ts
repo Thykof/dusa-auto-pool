@@ -84,9 +84,9 @@ export async function removeLiquidity(
     const data = l.data;
     console.log(data);
     if (data.startsWith('WITHDRAWN_FROM_BIN:')) {
-      console.log(`WITHDRAWN_FROM_BIN: ${EventDecoder.decodeLiquidity(data)}`);
+      console.log('WITHDRAWN_FROM_BIN: ', EventDecoder.decodeLiquidity(data));
     } else if (data.startsWith('FEES_COLLECTED:')) {
-      console.log(`FEES_COLLECTED: ${EventDecoder.decodeCollectFees(data)}`);
+      console.log('FEES_COLLECTED', EventDecoder.decodeCollectFees(data));
     }
   });
 }

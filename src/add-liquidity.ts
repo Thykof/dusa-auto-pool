@@ -96,7 +96,7 @@ export async function addLiquidity(
         `COMPOSITION_FEE: ${EventDecoder.decodeCompositionFee(data)}`,
       );
     } else if (data.startsWith('DEPOSITED_TO_BIN:')) {
-      console.log(`DEPOSITED_TO_BIN: ${EventDecoder.decodeLiquidity(data)}`);
+      console.log('DEPOSITED_TO_BIN: ', EventDecoder.decodeLiquidity(data));
     }
   });
 }
