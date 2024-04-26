@@ -1,21 +1,93 @@
-import * as dotenv from 'dotenv';
-import { readFileSync } from 'fs';
-import { fileURLToPath } from 'url';
-import path from 'path';
+import {
+  Client,
+  EOperationStatus,
+  fromMAS,
+  IAccount,
+  IBaseAccount,
+  ProviderType,
+  PublicApiClient,
+  WalletClient,
+  Web3Account,
+} from '@massalabs/massa-web3';
 
-dotenv.config();
+export const getClient = async (
+  secretKey: string,
+): Promise<{
+  client: Client;
+  account: IAccount;
+  baseAccount: IBaseAccount;
+  chainId: bigint;
+}> => {
+  const account = await WalletClient.getAccountFromSecretKey(secretKey);
 
-export function getEnvVariable(key: string): string {
-  const value = process.env[key];
-  if (!value) {
-    throw new Error(`Missing ${key} in .env file`);
-  }
-  return value;
+  const clientConfig = {
+    retryStrategyOn: true,
+    providers: [
+      { url: process.env.JSON_RPC_URL_PUBLIC!, type: ProviderType.PUBLIC },
+    ],
+    periodOffset: 9,
+  };
+
+  const publicApi = new PublicApiClient(clientConfig);
+  const status = await publicApi.getNodeStatus();
+
+  const web3account = new Web3Account(account, publicApi, status.chain_id);
+  const client = new Client(clientConfig, web3account, publicApi);
+
+  return {
+    client,
+    account,
+    baseAccount: client.wallet().getBaseAccount()!,
+    chainId: status.chain_id,
+  };
+};
+
+export async function waitOp(
+  client: Client,
+  operationId: string,
+  untilFinal = true,
+) {
+  const status = await client
+    .smartContracts()
+    .awaitMultipleRequiredOperationStatus(
+      operationId,
+      [
+        EOperationStatus.SPECULATIVE_ERROR,
+        EOperationStatus.SPECULATIVE_SUCCESS,
+      ],
+      180_000,
+    );
+
+  const events = await client.smartContracts().getFilteredScOutputEvents({
+    start: null,
+    end: null,
+    original_caller_address: null,
+    original_operation_id: operationId,
+    emitter_address: null,
+    is_final: null,
+  });
+
+  if (!untilFinal) return { status, events };
+
+  await client
+    .smartContracts()
+    .awaitMultipleRequiredOperationStatus(
+      operationId,
+      [EOperationStatus.FINAL_ERROR, EOperationStatus.FINAL_SUCCESS],
+      180_000,
+    );
+
+  return {
+    status,
+    events,
+  };
 }
 
-export function getScByteCode(folderName: string, fileName: string): Buffer {
-  // Obtain the current file name and directory paths
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = path.dirname(path.dirname(__filename));
-  return readFileSync(path.join(__dirname, folderName, fileName));
+export async function getBalance(
+  address: string,
+  client: Client,
+): Promise<bigint> {
+  return fromMAS(
+    (await client.publicApi().getAddresses([address]))[0].candidate_balance,
+  );
 }
