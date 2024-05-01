@@ -29,7 +29,9 @@ sudo docker compose up -d
 sudo docker compose logs -f
 ```
 
-## Developer tips
+### **Happy Dusaing!**
+
+## Author tips
 
 To disable tips, change to 'true' the environment variable `DONT_SAY_THANKS_THYKOF` in `.env` file.
 
@@ -40,4 +42,24 @@ Tips are:
 
 Note: *automatic tips is a common practice for crypto-mining software, but you can disable it if you want.*
 
-# **Happy Dusaing!**
+## Disclaimer
+
+This software is provided "as is" and without any warranty. You are responsible for your own actions.
+
+Before using this software, you must read and accept the [LICENSE](LICENSE) file.
+
+Before running the software, make sure:
+
+- you read and understand the code
+- you accept that your capital is at risk, and you can lose all your money
+- you know that there is no guarantee of return on investment
+- you must understand the fees of the swap, the fees of the pool composition and the impermanent loss
+- you must understand the risks of the smart contract, the risks of the blockchain, the risks of the software
+
+## Developer
+
+Don't hesitate to fork and submit a pool request to contribute to Massa ecosystem ;)
+
+## License
+
+GNU General Public License v3.0
