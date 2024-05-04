@@ -113,9 +113,10 @@ async function main() {
   //   await autoLiquidity(binStep, client, account, pair);
   // }, interval);
 
+  const pair = new PairV2(WETH, WMAS);
+  const binStep = PAIR_TO_BIN_STEP['WETH-WMAS'];
+  await autoLiquidity(binStep, client, account, pair);
   setInterval(async () => {
-    const pair = new PairV2(WETH, WMAS);
-    const binStep = PAIR_TO_BIN_STEP['WETH-WMAS'];
     await autoLiquidity(binStep, client, account, pair);
   }, interval);
 }
