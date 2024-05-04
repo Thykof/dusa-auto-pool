@@ -12,7 +12,7 @@ import {
   ILBPair,
   EventDecoder,
   LiquidityDistributionParams,
-  parseEther,
+  CompositionFeeEvent,
 } from '@dusalabs/sdk';
 import { Client, IAccount } from '@massalabs/massa-web3';
 // import { getClient } from './client';
@@ -65,13 +65,6 @@ export async function addLiquidity(
     deltaIds: [0],
     distributionX: [10n ** 18n],
     distributionY: [10n ** 18n],
-    // deltaIds: [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5],
-    // distributionX: [0, 0, 0, 0, 0, 0, 0.3, 0.24, 0, 0, 0].map(
-    //   (el) => parseEther(el.toString()),
-    // ),
-    // distributionY: [0, 0, 0, 0.24, 0.3, 0, 0, 0, 0, 0, 0].map(
-    //   (el) => parseEther(el.toString()),
-    // ),
   };
 
   const params = pair.liquidityCallParameters({
@@ -88,16 +81,19 @@ export async function addLiquidity(
   console.log('txId add liquidity', txId);
   const { status, events } = await waitOp(client, txId, false);
   console.log('status: ', status);
+  let resultEvent: CompositionFeeEvent | undefined;
   events.map((l) => {
     const data = l.data;
     if (data.startsWith('COMPOSITION_FEE:')) {
-      console.log('COMPOSITION_FEE: ', EventDecoder.decodeCompositionFee(data));
+      resultEvent = EventDecoder.decodeCompositionFee(data);
     } else if (data.startsWith('DEPOSITED_TO_BIN:')) {
       console.log('DEPOSITED_TO_BIN: ', EventDecoder.decodeLiquidity(data));
     } else {
       console.log(data);
     }
   });
+
+  return resultEvent;
 }
 
 async function main() {

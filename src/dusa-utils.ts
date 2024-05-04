@@ -1,6 +1,5 @@
 import {
   ChainId,
-  LB_ROUTER_ADDRESS,
   PairV2,
   WMAS as _WMAS,
   USDC as _USDC,
