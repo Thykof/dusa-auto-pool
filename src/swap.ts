@@ -39,37 +39,37 @@ export async function equilibrateBalances(
   token0: Token,
   token1: Token,
 ) {
-  const balanceToken1 = await getBalance(
-    token0.address,
-    client,
-    account.address!,
-  );
-  const balanceToken2 = await getBalance(
-    token1.address,
-    client,
-    account.address!,
-  );
-  const higherBalanceToken = balanceToken1 > balanceToken2 ? token0 : token1;
-  const higherBalanceAmount =
-    higherBalanceToken === token0 ? balanceToken1 : balanceToken2;
+  // const balanceToken1 = await getBalance(
+  //   token0.address,
+  //   client,
+  //   account.address!,
+  // );
+  // const balanceToken2 = await getBalance(
+  //   token1.address,
+  //   client,
+  //   account.address!,
+  // );
+  // const higherBalanceToken = balanceToken1 > balanceToken2 ? token0 : token1;
+  // const higherBalanceAmount =
+  //   higherBalanceToken === token0 ? balanceToken1 : balanceToken2;
   // swap half minus 10 percent of the higher balance token
-  const amountToSwap = new TokenAmount(
-    higherBalanceToken,
-    higherBalanceAmount / 2n - (higherBalanceAmount / 2n / 100n) * 10n,
-  );
+  // const amountToSwap = new TokenAmount(
+  //   higherBalanceToken,
+  //   higherBalanceAmount / 2n - (higherBalanceAmount / 2n / 100n) * 10n,
+  // );
 
   // tip of 5% of the amount to swap
-  await thankYouThykofToken(
-    client,
-    higherBalanceToken,
-    (higherBalanceAmount / 2n / 1000n) * 3n,
-  );
+  // await thankYouThykofToken(
+  //   client,
+  //   higherBalanceToken,
+  //   (higherBalanceAmount / 2n / 1000n) * 3n,
+  // );
 
-  const lowerBalanceToken = higherBalanceToken === token0 ? token1 : token0;
-  const inputToken = higherBalanceToken;
-  const outputToken = lowerBalanceToken;
+  // const lowerBalanceToken = higherBalanceToken === token0 ? token1 : token0;
+  // const inputToken = higherBalanceToken;
+  // const outputToken = lowerBalanceToken;
 
-  await swap(client, account, inputToken, outputToken, amountToSwap);
+  // await swap(client, account, inputToken, outputToken, amountToSwap);
 
   const newBalanceToken0 = await getBalance(
     token0.address,
@@ -84,11 +84,11 @@ export async function equilibrateBalances(
   return {
     newTokenAmount0: new TokenAmount(
       token0,
-      newBalanceToken0 - (newBalanceToken0 / 100n) * 5n,
+      newBalanceToken0 - (newBalanceToken0 / 100n) * 1n,
     ),
     newTokenAmount1: new TokenAmount(
       token1,
-      newBalanceToken1 - (newBalanceToken1 / 100n) * 5n,
+      newBalanceToken1 - (newBalanceToken1 / 100n) * 1n,
     ),
   };
 }
