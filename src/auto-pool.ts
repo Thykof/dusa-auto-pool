@@ -17,8 +17,9 @@ import {
   PAIR_TO_BIN_STEP,
 } from './dusa-utils';
 import { thankYouThykofMAS } from './transfer';
-import { equilibrateBalances } from './swap';
+import { equilibrateBalances } from './equilibrateBalances';
 import { getBalance } from './balance';
+import { aggregateFees } from './profitability';
 config();
 
 const CHAIN_ID = ChainId.MAINNET;
@@ -41,6 +42,9 @@ async function autoLiquidity(
   );
   const totalSupplies = await pairContract.getSupplies(userPositionIds);
   const totalUserSupplies = totalSupplies.reduce((acc, curr) => acc + curr, 0n);
+  let oldTokenAmount0: TokenAmount | undefined = undefined;
+  let oldTokenAmount1: TokenAmount | undefined = undefined;
+
   if (totalUserSupplies === 0n) {
     console.log("no liquidity, let's add some");
     const balanceToken0 = await getBalance(
@@ -70,7 +74,7 @@ async function autoLiquidity(
     userPositionIds,
   );
   if (!providingActiveBin) {
-    await removeLiquidity(
+    const collectedFees = await removeLiquidity(
       binStep,
       client,
       account,
@@ -80,7 +84,6 @@ async function autoLiquidity(
       userPositionIds,
     );
 
-    // equilibrate the balances with a swap before adding liquidity
     const { newTokenAmount0, newTokenAmount1 } = await equilibrateBalances(
       client,
       account,
@@ -88,7 +91,7 @@ async function autoLiquidity(
       pair.token1,
     );
 
-    await addLiquidity(
+    const compositionFees = await addLiquidity(
       binStep,
       client,
       account,
@@ -96,6 +99,18 @@ async function autoLiquidity(
       newTokenAmount1,
       pair,
     );
+
+    await aggregateFees(
+      client,
+      pair,
+      oldTokenAmount0,
+      oldTokenAmount1,
+      compositionFees,
+      collectedFees,
+    );
+
+    oldTokenAmount0 = newTokenAmount0;
+    oldTokenAmount1 = newTokenAmount1;
   } else {
     console.log('Active bin already in position');
   }
@@ -104,7 +119,7 @@ async function autoLiquidity(
 async function main() {
   const { client, account } = await getClient(process.env.WALLET_SECRET_KEY!);
 
-  const interval = 1000 * 60 * 10;
+  const interval = 1000 * 60 * 5;
 
   // For now it won't work with multiple pairs that have token in common
   // setInterval(async () => {

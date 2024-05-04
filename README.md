@@ -63,3 +63,131 @@ Don't hesitate to fork and submit a pool request to contribute to Massa ecosyste
 ## License
 
 GNU General Public License v3.0
+
+## Profitability optimization
+
+Base token is X, it's to the left of the slash in the pair but to the right in the pool distribution.
+Quote token is Y, it's to the right of the slash in the pair but to the left in the pool distribution.
+
+The position can exit the active bin in both side.
+
+If in your position you have only X.
+It means that you buy X and sell Y, people are buying Y and selling X.
+It means the price of Y increased and the price of X decreased.
+It means also that the pool distribution shifted to the right.
+You need to remove and swap to Y.
+While removing, you will collect fees of both tokens.
+While swapping, you will pay fees of X (I think).
+
+```
+/*
+collected fees
+X: 0.001_028_756_799_208_068 ETH (base)
+Y: 18.862_156_826 MAS (quote)
+
+composition fees
+X: 0.000_313_735_272_304_771 ETH (base)
+Y: 0 MAS (quote)
+
+swap fees
+X: 0.000_000_000_000_000 ETH (base)
+Y: 0 MAS (quote)
+
+*/
+price increase by one bin:
+FEES_COLLECTED {
+  caller: 'AS12UMSUxgpRBB6ArZDJ19arHoxNkkpdfofQGekAiAJqsuE6PEFJy',
+  to: 'AU12ScWGycW9sZNbCBq6QgJos2DpBNr6J8CLbMPNWeFFQoRiw3nqD',
+  amountX: 136329825458304n,
+  amountY: 12677833699n
+}
+swap:
+Total fees percentage 0.15 %
+Fee: 0.0000174798 WETH.e
+Swapping 0.011653260 WETH.e for WMAS
+txId swap O12QA1Bjx9dPES5ZobnQgRxTf39qWGDNua4A9Mtq7RGnDMsBQGgY
+status:  6
+TRANSFER SUCCESS
+SWAP:  {
+  to: 'AU12ScWGycW9sZNbCBq6QgJos2DpBNr6J8CLbMPNWeFFQoRiw3nqD',
+  activeId: 8381476,
+  swapForY: true,
+  amountInToBin: 11635780551275554n,
+  amountOutOfBin: 264968492971n,
+  volatilityAccumulated: 0,
+  feesTotal: 0.000_017_480_516_728_316n
+}
+COMPOSITION_FEE:  {
+  to: 'AU12ScWGycW9sZNbCBq6QgJos2DpBNr6J8CLbMPNWeFFQoRiw3nqD',
+  id: 8381476,
+  activeFeeX: 0n,
+  activeFeeY: 1580936403n
+}
+// move again in the same side
+aggregateFees {
+  to: 'AU12ScWGycW9sZNbCBq6QgJos2DpBNr6J8CLbMPNWeFFQoRiw3nqD',
+  activeId: 8381478,
+  swapForY: true,
+  amountInToBin: 319983965160077n,
+  amountOutOfBin: 7308509852n,
+  volatilityAccumulated: 0,
+  feesTotal: 480696993230n
+} {
+  to: 'AU12ScWGycW9sZNbCBq6QgJos2DpBNr6J8CLbMPNWeFFQoRiw3nqD',
+  id: 8381478,
+  activeFeeX: 0n,
+  activeFeeY: 1658950354n
+} {
+  caller: 'AS12UMSUxgpRBB6ArZDJ19arHoxNkkpdfofQGekAiAJqsuE6PEFJy',
+  to: 'AU12ScWGycW9sZNbCBq6QgJos2DpBNr6J8CLbMPNWeFFQoRiw3nqD',
+  amountX: 0n,
+  amountY: 2043598431n
+}
+aggregateFees {
+  to: 'AU12ScWGycW9sZNbCBq6QgJos2DpBNr6J8CLbMPNWeFFQoRiw3nqD',
+  activeId: 8381478,
+  swapForY: true,
+  amountInToBin: 319983965160077n,
+  amountOutOfBin: 7308509852n,
+  volatilityAccumulated: 0,
+  feesTotal: 480696993230n
+} {
+  to: 'AU12ScWGycW9sZNbCBq6QgJos2DpBNr6J8CLbMPNWeFFQoRiw3nqD',
+  id: 8381478,
+  activeFeeX: 0n,
+  activeFeeY: 1658950354n
+} {
+  caller: 'AS12UMSUxgpRBB6ArZDJ19arHoxNkkpdfofQGekAiAJqsuE6PEFJy',
+  to: 'AU12ScWGycW9sZNbCBq6QgJos2DpBNr6J8CLbMPNWeFFQoRiw3nqD',
+  amountX: 0n,
+  amountY: 2043598431n
+}
+```
+
+If in your position you have only Y
+It means that you buy Y and sell X, people are buying X and selling Y.
+It means the price of X increased and the price of Y decreased.
+It means also that the pool distribution shifted to the left.
+You need to remove and swap to X.
+While removing, you will collect fees of both tokens.
+While swapping, you will pay fees of Y (I think).
+
+### Avoid composition fees
+
+You need to add the liquidity in the same ration as in the active bin.
+
+1. get the ratio of the active bin
+2. calculate the amount you need to swap to get the same ratio
+3. add to the pool
+
+### Calculating impermanent loss
+
+You know the bin were you put your liquidity.
+
+1. get the price of this bin
+2. get the price of the active bin
+3. get the amount you put in the pool originally
+4. get the amount you have now in the pool
+5. if you have only X
+ a. calculate how much Y' you can have if you sell your X until you have the same amount originally.
+ b. calculate the difference between Y' and Y.
