@@ -4,11 +4,11 @@ import { config } from 'dotenv';
 import { Client, IAccount } from '@massalabs/massa-web3';
 import {
   PairV2,
-  TokenAmount,
   WMAS as _WMAS,
   USDC as _USDC,
   WETH as _WETH,
   ChainId,
+  LiquidityEvent,
 } from '@dusalabs/sdk';
 import { removeLiquidity } from './remove-liquidity';
 import {
@@ -17,8 +17,7 @@ import {
   PAIR_TO_BIN_STEP,
 } from './dusa-utils';
 import { thankYouThykofMAS } from './transfer';
-import { equilibrateBalances } from './equilibrateBalances';
-import { getBalance } from './balance';
+import { getAmountsToAdd } from './equilibrateBalances';
 import { aggregateFees } from './profitability';
 config();
 
@@ -27,6 +26,8 @@ const CHAIN_ID = ChainId.MAINNET;
 const WMAS = _WMAS[CHAIN_ID];
 const USDC = _USDC[CHAIN_ID];
 const WETH = _WETH[CHAIN_ID];
+
+let oldDepositedEvents: LiquidityEvent[] = [];
 
 async function autoLiquidity(
   binStep: number,
@@ -42,29 +43,24 @@ async function autoLiquidity(
   );
   const totalSupplies = await pairContract.getSupplies(userPositionIds);
   const totalUserSupplies = totalSupplies.reduce((acc, curr) => acc + curr, 0n);
-  let oldTokenAmount0: TokenAmount | undefined = undefined;
-  let oldTokenAmount1: TokenAmount | undefined = undefined;
 
   if (totalUserSupplies === 0n) {
     console.log("no liquidity, let's add some");
-    const balanceToken0 = await getBalance(
-      pair.token0.address,
+    const { amount0, amount1 } = await getAmountsToAdd(
       client,
-      account.address!,
+      account,
+      pair.token0,
+      pair.token1,
     );
-    const balanceToken1 = await getBalance(
-      pair.token1.address,
-      client,
-      account.address!,
-    );
-    await addLiquidity(
+    const { depositEvents } = await addLiquidity(
       binStep,
       client,
       account,
-      new TokenAmount(pair.token0, balanceToken0 - (balanceToken0 / 100n) * 5n),
-      new TokenAmount(pair.token1, balanceToken1 - (balanceToken1 / 100n) * 5n),
+      amount0,
+      amount1,
       pair,
     );
+    oldDepositedEvents = depositEvents;
     await thankYouThykofMAS(client, 10_000_000n);
     return;
   }
@@ -74,7 +70,7 @@ async function autoLiquidity(
     userPositionIds,
   );
   if (!providingActiveBin) {
-    const collectedFees = await removeLiquidity(
+    const { feesCollectedEvent, withdrawEvents } = await removeLiquidity(
       binStep,
       client,
       account,
@@ -84,33 +80,36 @@ async function autoLiquidity(
       userPositionIds,
     );
 
-    const { newTokenAmount0, newTokenAmount1 } = await equilibrateBalances(
+    const { amount0, amount1 } = await getAmountsToAdd(
       client,
       account,
       pair.token0,
       pair.token1,
     );
 
-    const compositionFees = await addLiquidity(
+    const { compositionFeeEvent, depositEvents } = await addLiquidity(
       binStep,
       client,
       account,
-      newTokenAmount0,
-      newTokenAmount1,
+      amount0,
+      amount1,
       pair,
     );
 
-    await aggregateFees(
-      client,
-      pair,
-      oldTokenAmount0,
-      oldTokenAmount1,
-      compositionFees,
-      collectedFees,
-    );
+    try {
+      await aggregateFees(
+        client,
+        pair,
+        withdrawEvents,
+        oldDepositedEvents,
+        compositionFeeEvent,
+        feesCollectedEvent,
+      );
+    } catch (error) {
+      console.error('Error aggregating fees', error);
+    }
 
-    oldTokenAmount0 = newTokenAmount0;
-    oldTokenAmount1 = newTokenAmount1;
+    oldDepositedEvents = depositEvents;
   } else {
     console.log('Active bin already in position');
   }

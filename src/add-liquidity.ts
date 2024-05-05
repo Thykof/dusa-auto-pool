@@ -13,6 +13,7 @@ import {
   EventDecoder,
   LiquidityDistributionParams,
   CompositionFeeEvent,
+  LiquidityEvent,
 } from '@dusalabs/sdk';
 import { Client, IAccount } from '@massalabs/massa-web3';
 // import { getClient } from './client';
@@ -76,24 +77,28 @@ export async function addLiquidity(
   });
 
   // add liquidity
-  console.log(`Adding liquidity ${tokenAmount0.raw} ${tokenAmount1.raw}`);
+  console.log(`-----Adding liquidity ${tokenAmount0.raw} ${tokenAmount1.raw}`);
   const txId = await new IRouter(router, client).add(params);
   console.log('txId add liquidity', txId);
   const { status, events } = await waitOp(client, txId, false);
   console.log('status: ', status);
-  let resultEvent: CompositionFeeEvent | undefined;
+  let compositionFeeEvent: CompositionFeeEvent | undefined;
+  const depositEvents: LiquidityEvent[] = [];
   events.map((l) => {
     const data = l.data;
     if (data.startsWith('COMPOSITION_FEE:')) {
-      resultEvent = EventDecoder.decodeCompositionFee(data);
+      compositionFeeEvent = EventDecoder.decodeCompositionFee(data);
+      console.log('COMPOSITION_FEE: ', compositionFeeEvent);
     } else if (data.startsWith('DEPOSITED_TO_BIN:')) {
-      console.log('DEPOSITED_TO_BIN: ', EventDecoder.decodeLiquidity(data));
+      const depositEvent = EventDecoder.decodeLiquidity(data);
+      depositEvents.push(depositEvent);
+      console.log('DEPOSITED_TO_BIN: ', depositEvent);
     } else {
       console.log(data);
     }
   });
 
-  return resultEvent;
+  return { compositionFeeEvent, depositEvents };
 }
 
 async function main() {
