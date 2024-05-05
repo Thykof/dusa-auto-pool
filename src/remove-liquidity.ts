@@ -10,6 +10,7 @@ import {
   ILBPair,
   EventDecoder,
   CollectFeesEvent,
+  LiquidityEvent,
 } from '@dusalabs/sdk';
 import { Client, IAccount } from '@massalabs/massa-web3';
 import { getClient, waitOp } from './utils';
@@ -80,22 +81,26 @@ export async function removeLiquidity(
 
   // remove liquidity
   const txId = await new IRouter(router, client).remove(params);
-  console.log('txId remove liquidity', txId);
+  console.log('-------txId remove liquidity', txId);
   const { status, events } = await waitOp(client, txId, false);
   console.log('status: ', status);
-  let resultEvent: CollectFeesEvent | undefined;
+  let feesCollectedEvent: CollectFeesEvent | undefined;
+  const withdrawEvents: LiquidityEvent[] = [];
   events.map((l) => {
     const data = l.data;
     if (data.startsWith('WITHDRAWN_FROM_BIN:')) {
-      console.log('WITHDRAWN_FROM_BIN: ', EventDecoder.decodeLiquidity(data));
+      const withdrawEvent = EventDecoder.decodeLiquidity(data);
+      withdrawEvents.push(withdrawEvent);
+      console.log('WITHDRAWN_FROM_BIN: ', withdrawEvent);
     } else if (data.startsWith('FEES_COLLECTED:')) {
-      resultEvent = EventDecoder.decodeCollectFees(data);
+      feesCollectedEvent = EventDecoder.decodeCollectFees(data);
+      console.log('FEES_COLLECTED: ', feesCollectedEvent);
     } else {
       console.log(data);
     }
   });
 
-  return resultEvent;
+  return { feesCollectedEvent, withdrawEvents };
 }
 
 async function main() {

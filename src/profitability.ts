@@ -8,6 +8,7 @@ import {
   USDC as _USDC,
   PairV2,
   TokenAmount,
+  LiquidityEvent,
 } from '@dusalabs/sdk';
 import fs from 'fs';
 import { getClient } from './utils';
@@ -22,21 +23,26 @@ const USDC = _USDC[CHAIN_ID];
 
 const logFile = new Date().getTime() + '.log';
 const logFileProfitAndLoss = `${new Date().getTime()}_p-and-l.log`;
+const logFileIL = `${new Date().getTime()}_il.log`;
+const logFileILAcc = `${new Date().getTime()}_il_acc.log`;
+const logFileTotal = `${new Date().getTime()}_total_acc.log`;
 
 function pushInFile(fileName: string, value: string) {
   fs.appendFileSync(fileName, value + '\n');
 }
 
 let profitAndLoss = 0n;
+let totalIL = 0n;
 
 export async function aggregateFees(
   client: Client,
   pair: PairV2,
-  tokenAmount0?: TokenAmount,
-  tokenAmount1?: TokenAmount,
+  withdrawEvents: LiquidityEvent[],
+  depositedEvents: LiquidityEvent[],
   compositionFees?: CompositionFeeEvent,
   collectedFees?: CollectFeesEvent,
 ) {
+  // #1 composition fees and collected fees
   const { rewardsX, rewardsY } = totalRewards(compositionFees, collectedFees);
   console.log('rewards', rewardsX, rewardsY);
   const token0isX = pair.token0.sortsBefore(pair.token1);
@@ -48,29 +54,32 @@ export async function aggregateFees(
   const outputToken = token0isX ? pair.token1 : pair.token0;
   const tokenX = token0isX ? pair.token0 : pair.token1; // WETH
   const tokenY = token0isX ? pair.token1 : pair.token0; // WMAS
-  let amountIn = new TokenAmount(tokenX, rewardsX);
+  let removedAmountIn = new TokenAmount(tokenX, rewardsX);
 
   console.log(
     'amountIn',
-    amountIn.toSignificant(tokenX.decimals),
-    amountIn.raw,
+    removedAmountIn.toSignificant(tokenX.decimals),
+    removedAmountIn.raw,
   );
-  let outputAmount;
+  let feesGains: TokenAmount;
   let neg = false;
-  if (amountIn.raw !== 0n) {
-    neg = amountIn.raw < 0n;
+  if (removedAmountIn.raw !== 0n) {
+    neg = removedAmountIn.raw < 0n;
     if (neg) {
       console.log('amountIn is negative');
-      amountIn = new TokenAmount(tokenX, amountIn.raw * -1n);
+      removedAmountIn = new TokenAmount(tokenX, removedAmountIn.raw * -1n);
     }
     const { bestTrade } = await findBestTrade(
       client,
       inputToken,
       outputToken,
-      amountIn,
+      removedAmountIn,
       true,
     );
-    outputAmount = new TokenAmount(tokenY, bestTrade.outputAmount.raw * -1n);
+    feesGains = new TokenAmount(
+      tokenY,
+      neg ? bestTrade.outputAmount.raw * -1n : bestTrade.outputAmount.raw,
+    );
     console.log(
       `outputAmount ${bestTrade.outputAmount.toSignificant(tokenY.decimals)} ${
         tokenY.symbol
@@ -78,16 +87,88 @@ export async function aggregateFees(
     );
   } else {
     console.log('no rewards to trade');
-    outputAmount = new TokenAmount(tokenY, rewardsY);
+    feesGains = new TokenAmount(tokenY, rewardsY);
     console.log(
-      `rewards ${outputAmount.toSignificant(tokenY.decimals)} ${tokenY.symbol}`,
+      `rewards ${feesGains.toSignificant(tokenY.decimals)} ${tokenY.symbol}`,
     );
   }
-  profitAndLoss += outputAmount.raw;
-  pushInFile(logFile, outputAmount.toSignificant(tokenY.decimals));
+  profitAndLoss += feesGains.raw;
+  pushInFile(logFile, feesGains.toSignificant(tokenY.decimals));
   pushInFile(
     logFileProfitAndLoss,
     new TokenAmount(tokenY, profitAndLoss).toSignificant(tokenY.decimals),
+  );
+
+  // #2 impermanent loss
+  let impermanentLoss = 0n;
+  if (depositedEvents) {
+    // get the removed liquidity and convert into Y
+    const withdrawAmountX = withdrawEvents.reduce(
+      (acc, curr) => acc + curr.amountX,
+      0n,
+    );
+    const withdrawAmountY = withdrawEvents.reduce(
+      (acc, curr) => acc + curr.amountY,
+      0n,
+    );
+    console.log('withdrawAmountX', withdrawAmountX);
+    console.log('withdrawAmountY', withdrawAmountY);
+
+    let removedAmountY = 0n;
+    if (withdrawAmountX > 0n) {
+      const { bestTrade } = await findBestTrade(
+        client,
+        inputToken,
+        outputToken,
+        new TokenAmount(tokenX, withdrawAmountX),
+        true,
+      );
+      removedAmountY = bestTrade.outputAmount.raw;
+    }
+    const totalRemoved = removedAmountY + withdrawAmountY;
+    console.log('totalRemoved', totalRemoved);
+
+    // get the added liquidity and convert into Y
+    const addedAmountX = depositedEvents.reduce(
+      (acc, curr) => acc + curr.amountX,
+      0n,
+    );
+    const addedAmountY = depositedEvents.reduce(
+      (acc, curr) => acc + curr.amountY,
+      0n,
+    );
+    let addedY = 0n;
+    if (addedAmountX > 0n) {
+      const { bestTrade } = await findBestTrade(
+        client,
+        inputToken,
+        outputToken,
+        new TokenAmount(tokenX, addedAmountX),
+        true,
+      );
+      addedY = bestTrade.outputAmount.raw;
+    }
+    const totalAdded = addedY + addedAmountY;
+    console.log('totalAdded', totalAdded);
+
+    // log impermanent loss
+    impermanentLoss = totalAdded - totalRemoved;
+    totalIL += impermanentLoss;
+    pushInFile(
+      logFileIL,
+      new TokenAmount(tokenY, impermanentLoss).toSignificant(tokenY.decimals),
+    );
+    pushInFile(
+      logFileILAcc,
+      new TokenAmount(tokenY, totalIL).toSignificant(tokenY.decimals),
+    );
+  }
+
+  // #3 total
+  const total = impermanentLoss + impermanentLoss;
+  pushInFile(
+    logFileTotal,
+    new TokenAmount(tokenY, total).toSignificant(tokenY.decimals),
   );
 }
 
@@ -95,6 +176,8 @@ function totalRewards(
   compositionFees?: CompositionFeeEvent,
   collectedFees?: CollectFeesEvent,
 ) {
+  console.log('composition fees', compositionFees);
+  console.log('collected fees', collectedFees);
   const rewardsX =
     (collectedFees?.amountX || 0n) - (compositionFees?.activeFeeX || 0n);
   const rewardsY =
@@ -142,8 +225,8 @@ async function main() {
   await aggregateFees(
     client,
     pair,
-    new TokenAmount(WETH, 0n),
-    new TokenAmount(WMAS, 0n),
+    [],
+    [],
     {
       to: account.address!,
       id: 0,
@@ -161,8 +244,8 @@ async function main() {
   await aggregateFees(
     client,
     pair,
-    new TokenAmount(WETH, 0n),
-    new TokenAmount(WMAS, 0n),
+    [],
+    [],
     {
       to: account.address!,
       id: 0,

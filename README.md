@@ -71,13 +71,15 @@ Quote token is Y, it's to the right of the slash in the pair but to the left in 
 
 The position can exit the active bin in both side.
 
+When the bin id increase, we remove from pool only Y.
+When the bin id decrease, we remove from pool only X.
+
 If in your position you have only X.
 It means that you buy X and sell Y, people are buying Y and selling X.
 It means the price of Y increased and the price of X decreased.
 It means also that the pool distribution shifted to the right.
-You need to remove and swap to Y.
 While removing, you will collect fees of both tokens.
-While swapping, you will pay fees of X (I think).
+While adding, you will pay composition fees on X.
 
 ```
 /*
@@ -162,23 +164,42 @@ aggregateFees {
   amountX: 0n,
   amountY: 2043598431n
 }
+// price decresed
+txId remove liquidity O12u11xxhdDT2qkwGj8dWsVCWD1Q33XUXJMePXcNdaL27MNwRfce
+FEES_COLLECTED {
+  caller: 'AS12UMSUxgpRBB6ArZDJ19arHoxNkkpdfofQGekAiAJqsuE6PEFJy',
+  to: 'AU12ScWGycW9sZNbCBq6QgJos2DpBNr6J8CLbMPNWeFFQoRiw3nqD',
+  amountX: 692374642114815n,
+  amountY: 2195653403n
+}
+WITHDRAWN_FROM_BIN:  {
+  to: 'AU12ScWGycW9sZNbCBq6QgJos2DpBNr6J8CLbMPNWeFFQoRiw3nqD',
+  id: 8381491,
+  amountX: 510888573573552814n,
+  amountY: 0n
+}
+Adding liquidity 506465145755264007 121197169510
+txId add liquidity O1296HaHf7p1jwcQe1cASsJfPyaPWnJXPupDiE9DM32pVAg4HtWF
+COMPOSITION_FEE:  {
+  to: 'AU12ScWGycW9sZNbCBq6QgJos2DpBNr6J8CLbMPNWeFFQoRiw3nqD',
+  id: 8381488,
+  activeFeeX: 404699251039797n,
+  activeFeeY: 0n
+}
+DEPOSITED_TO_BIN:  {
+  to: 'AU12ScWGycW9sZNbCBq6QgJos2DpBNr6J8CLbMPNWeFFQoRiw3nqD',
+  id: 8381488,
+  amountX: 506060446504224210n,
+  amountY: 121197169510n
+}
 ```
 
 If in your position you have only Y
 It means that you buy Y and sell X, people are buying X and selling Y.
 It means the price of X increased and the price of Y decreased.
 It means also that the pool distribution shifted to the left.
-You need to remove and swap to X.
 While removing, you will collect fees of both tokens.
-While swapping, you will pay fees of Y (I think).
-
-### Avoid composition fees
-
-You need to add the liquidity in the same ration as in the active bin.
-
-1. get the ratio of the active bin
-2. calculate the amount you need to swap to get the same ratio
-3. add to the pool
+While adding, you will pay composition fees on Y.
 
 ### Calculating impermanent loss
 

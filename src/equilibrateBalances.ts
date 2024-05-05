@@ -9,7 +9,7 @@ import {
 import { IAccount } from '@massalabs/massa-web3';
 import { getBalance } from './balance';
 
-export async function equilibrateBalances(
+export async function getAmountsToAdd(
   client: Client,
   account: IAccount,
   token0: Token,
@@ -26,11 +26,11 @@ export async function equilibrateBalances(
     account.address!,
   );
   return {
-    newTokenAmount0: new TokenAmount(
+    amount0: new TokenAmount(
       token0,
       newBalanceToken0 - (newBalanceToken0 / 100n) * 1n,
     ),
-    newTokenAmount1: new TokenAmount(
+    amount1: new TokenAmount(
       token1,
       newBalanceToken1 - (newBalanceToken1 / 100n) * 1n,
     ),
