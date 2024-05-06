@@ -18,7 +18,7 @@ import {
 } from './dusa-utils';
 import { thankYouThykofMAS } from './transfer';
 import { getAmountsToAdd } from './equilibrateBalances';
-import { aggregateFees } from './profitability';
+import { profitability } from './profitability';
 config();
 
 const CHAIN_ID = ChainId.MAINNET;
@@ -97,7 +97,7 @@ async function autoLiquidity(
     );
 
     try {
-      await aggregateFees(
+      await profitability(
         client,
         pair,
         withdrawEvents,
