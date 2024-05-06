@@ -1,6 +1,5 @@
 import { addLiquidity } from './add-liquidity';
 import { getClient } from './utils';
-import { config } from 'dotenv';
 import { Client, IAccount } from '@massalabs/massa-web3';
 import {
   PairV2,
@@ -19,6 +18,7 @@ import {
 import { thankYouThykofMAS } from './transfer';
 import { getAmountsToAdd } from './equilibrateBalances';
 import { profitability } from './profitability';
+import { config } from 'dotenv';
 config();
 
 const CHAIN_ID = ChainId.MAINNET;
