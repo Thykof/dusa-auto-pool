@@ -131,7 +131,7 @@ async function main() {
       await autoLiquidity(binStep, client, account, pair);
     }, interval);
   } else if (process.env.PAIR === 'USDC-WMAS') {
-    console.log('WETH-WMAS');
+    console.log('USDC-WMAS');
     const pair = new PairV2(USDC, WMAS);
     const binStep = PAIR_TO_BIN_STEP['USDC-WMAS'];
     await autoLiquidity(binStep, client, account, pair);

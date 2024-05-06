@@ -4,7 +4,7 @@ services:
   pool-weth:
     build:
       context: .
-    container_name: dusa-auto-pool
+    container_name: dusa-auto-pool-weth
     restart: always
     volumes:
       - ./src:/src
@@ -14,7 +14,7 @@ services:
   pool-usdc:
     build:
       context: .
-    container_name: dusa-auto-pool
+    container_name: dusa-auto-pool-usdc
     restart: always
     volumes:
       - ./src:/src
