@@ -21,8 +21,8 @@ const WMAS = _WMAS[CHAIN_ID];
 const WETH = _WETH[CHAIN_ID];
 const USDC = _USDC[CHAIN_ID];
 
-const logFile = new Date().getTime() + '.log';
-const logFileProfitAndLoss = `${new Date().getTime()}_p-and-l.log`;
+const logFile = new Date().getTime() + '_p-and-l.log';
+const logFileProfitAndLoss = `${new Date().getTime()}_p-and-l-acc.log`;
 const logFileIL = `${new Date().getTime()}_il.log`;
 const logFileILAcc = `${new Date().getTime()}_il_acc.log`;
 const logFileTotal = `${new Date().getTime()}_total.log`;
