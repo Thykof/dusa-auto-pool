@@ -107,7 +107,7 @@ async function main() {
   const tokenAmount1 = new TokenAmount(USDC, parseUnits('10', USDC.decimals));
   const tokenAmount2 = new TokenAmount(WMAS, parseUnits('100', WMAS.decimals));
   const pair = new PairV2(USDC, WMAS);
-  const binStep = PAIR_TO_BIN_STEP['WMAS-USDC'];
+  const binStep = PAIR_TO_BIN_STEP['USDC-WMAS'];
 
   await addLiquidity(
     binStep,
