@@ -121,18 +121,26 @@ async function main() {
   const interval = 1000 * 60 * 5;
 
   // For now it won't work with multiple pairs that have token in common
-  // setInterval(async () => {
-  //   const pair = new PairV2(USDC, WMAS);
-  //   const binStep = PAIR_TO_BIN_STEP['WMAS-USDC'];
-  //   await autoLiquidity(binStep, client, account, pair);
-  // }, interval);
 
-  const pair = new PairV2(WETH, WMAS);
-  const binStep = PAIR_TO_BIN_STEP['WETH-WMAS'];
-  await autoLiquidity(binStep, client, account, pair);
-  setInterval(async () => {
+  if (process.env.PAIR === 'WETH-WMAS') {
+    console.log('WETH-WMAS');
+    const pair = new PairV2(WETH, WMAS);
+    const binStep = PAIR_TO_BIN_STEP['WETH-WMAS'];
     await autoLiquidity(binStep, client, account, pair);
-  }, interval);
+    setInterval(async () => {
+      await autoLiquidity(binStep, client, account, pair);
+    }, interval);
+  } else if (process.env.PAIR === 'USDC-WMAS') {
+    console.log('WETH-WMAS');
+    const pair = new PairV2(USDC, WMAS);
+    const binStep = PAIR_TO_BIN_STEP['USDC-WMAS'];
+    await autoLiquidity(binStep, client, account, pair);
+    setInterval(async () => {
+      await autoLiquidity(binStep, client, account, pair);
+    }, interval);
+  } else {
+    console.error('Invalid pair');
+  }
 }
 
 await main();

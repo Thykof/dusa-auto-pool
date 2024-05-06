@@ -1,10 +1,22 @@
 version: '3.5'
 
 services:
-  app:
+  pool-weth:
     build:
       context: .
     container_name: dusa-auto-pool
     restart: always
     volumes:
       - ./src:/src
+    env_file:
+      - .env.weth
+
+  pool-usdc:
+    build:
+      context: .
+    container_name: dusa-auto-pool
+    restart: always
+    volumes:
+      - ./src:/src
+    env_file:
+      - .env.usdc

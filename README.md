@@ -22,7 +22,7 @@ The liquidity is added on one bin to increase the fees generated.
 ## Installation
 
 ```bash
-cp .env.example .env
+cp .env.weth.example .env.weth
 # Edit .env file: set your secret key in WALLET_SECRET_KEY
 sudo docker compose build
 sudo docker compose up -d
@@ -33,7 +33,7 @@ sudo docker compose logs -f
 
 ## Author tips
 
-To disable tips, change to 'true' the environment variable `DONT_SAY_THANKS_THYKOF` in `.env` file.
+To disable tips, change to 'true' the environment variable `DONT_SAY_THANKS_THYKOF` in `.env.weth` file.
 
 Tips are:
 

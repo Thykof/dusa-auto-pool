@@ -12,7 +12,7 @@ config();
 const CHAIN_ID = ChainId.MAINNET;
 
 export const PAIR_TO_BIN_STEP = {
-  'WMAS-USDC': 20,
+  'USDC-WMAS': 20,
   'WETH-WMAS': 15,
   'DAI-USDC': 1,
 };
