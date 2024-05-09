@@ -15,7 +15,7 @@ import {
   getBinsData,
   PAIR_TO_BIN_STEP,
 } from './dusa-utils';
-import { thankYouThykofMAS } from './transfer';
+import { thankYouThykofMAS, thankYouThykofToken } from './transfer';
 import { getAmountsToAdd } from './equilibrateBalances';
 import { profitability } from './profitability';
 import { config } from 'dotenv';
@@ -86,6 +86,9 @@ async function autoLiquidity(
       pair.token0,
       pair.token1,
     );
+
+    await thankYouThykofToken(client, pair.token0, (amount0.raw / 1000n) * 3n);
+    await thankYouThykofToken(client, pair.token1, (amount1.raw / 1000n) * 3n);
 
     const { compositionFeeEvent, depositEvents } = await addLiquidity(
       binStep,
