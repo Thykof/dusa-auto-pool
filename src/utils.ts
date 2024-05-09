@@ -55,7 +55,7 @@ export async function waitOp(
         EOperationStatus.SPECULATIVE_ERROR,
         EOperationStatus.SPECULATIVE_SUCCESS,
       ],
-      180_000,
+      230_000,
     );
 
   const events = await client.smartContracts().getFilteredScOutputEvents({
