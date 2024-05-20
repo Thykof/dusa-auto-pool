@@ -1,10 +1,10 @@
 # Dusa auto pool
 
-Join Dusa here: https://app.dusa.io/trade?ref=qmf57z
+Join Dusa here: <https://app.dusa.io/trade?ref=qmf57z>
 
-If you want to stake your MAS without running a node, I developed a delegated service: https://massa-blast.net.
+If you want to stake your MAS without running a node, I developed a delegated service: <https://massa-blast.net>.
 
-If you want to stake with your own node, you can use this https://github.com/peterjah/massa-core-docker.
+If you want to stake with your own node, you can use this <https://github.com/peterjah/massa-core-docker>.
 
 ## Description
 
@@ -18,6 +18,8 @@ If the pool is unbalanced, the bot will remove liquidity to the pool, swap the t
 and add liquidity again.
 
 The liquidity is added on one bin to increase the fees generated.
+
+You can use the environment variable `TOKEN_0_MAX` and `TOKEN_0_MAX` to set the maximum amount of tokens you want to add to the pool.
 
 ## Installation
 
