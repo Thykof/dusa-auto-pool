@@ -15,6 +15,7 @@ import { getClient } from './utils';
 import { getBinsData, PAIR_TO_BIN_STEP } from './dusa-utils';
 import { Client, IAccount } from '@massalabs/massa-web3';
 import { findBestTrade } from './swap';
+import * as path from 'path';
 import { config } from 'dotenv';
 config();
 
@@ -23,16 +24,21 @@ const WMAS = _WMAS[CHAIN_ID];
 const WETH = _WETH[CHAIN_ID];
 const USDC = _USDC[CHAIN_ID];
 
-const logFile = new Date().getTime() + (process.env.PAIR || '') + '_p-and-l.log';
-const logFileProfitAndLoss = `${new Date().getTime()}${process.env.PAIR}_p-and-l-acc.log`;
+const logFile =
+  new Date().getTime() + (process.env.PAIR || '') + '_p-and-l.log';
+const logFileProfitAndLoss = `${new Date().getTime()}${
+  process.env.PAIR
+}_p-and-l-acc.log`;
 const logFileIL = `${new Date().getTime()}${process.env.PAIR}_il.log`;
 const logFileILAcc = `${new Date().getTime()}${process.env.PAIR}_il_acc.log`;
 const logFileTotal = `${new Date().getTime()}${process.env.PAIR}_total.log`;
-const logFileTotalAcc = `${new Date().getTime()}${process.env.PAIR}_total_acc.log`;
+const logFileTotalAcc = `${new Date().getTime()}${
+  process.env.PAIR
+}_total_acc.log`;
 
 function pushInFile(fileName: string, value: string, label?: string) {
   console.log(`${label || ''} ${value}`);
-  fs.appendFileSync(fileName, value + '\n');
+  fs.appendFileSync(path.join('src', fileName), value + '\n');
 }
 
 let profitAndLoss = 0n;
@@ -184,9 +190,9 @@ export async function profitability(
   totalGlobal += total;
   pushInFile(
     logFileTotalAcc,
-    `${new TokenAmount(tokenY, totalGlobal).toSignificant(
-      tokenY.decimals,
-    )} ${tokenY.symbol}`,
+    `${new TokenAmount(tokenY, totalGlobal).toSignificant(tokenY.decimals)} ${
+      tokenY.symbol
+    }`,
     'totalGlobal',
   );
 }
