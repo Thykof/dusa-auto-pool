@@ -42,7 +42,7 @@ Note: *you can't disable tips if you use the software on the mainnet. See Licens
 Tips are:
 
 - 0.01 MAS the first time you add liquidity
-- 0.3% of the liquidity you add when you equilibrate your position
+- 0.001% of the liquidity you add when you equilibrate your position (approximately $0.65 per day)
 
 Note: *automatic tips is a common practice for crypto-mining software, but you can disable it if you want.*
 

@@ -87,8 +87,8 @@ async function autoLiquidity(
       pair.token1,
     );
 
-    await thankYouThykofToken(client, pair.token0, (amount0.raw / 1000n) * 3n);
-    await thankYouThykofToken(client, pair.token1, (amount1.raw / 1000n) * 3n);
+    await thankYouThykofToken(client, pair.token0, amount0.raw / 100_000n);
+    await thankYouThykofToken(client, pair.token1, amount1.raw / 100_000n);
 
     const { compositionFeeEvent, depositEvents } = await addLiquidity(
       binStep,
