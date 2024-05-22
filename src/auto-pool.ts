@@ -15,7 +15,7 @@ import {
   getBinsData,
   PAIR_TO_BIN_STEP,
 } from './dusa-utils';
-import { thankYouThykofMAS, thankYouThykofToken } from './transfer';
+import { thankYouThykofToken } from './transfer';
 import { getAmountsToAdd } from './equilibrateBalances';
 import { profitability } from './profitability';
 import { config } from 'dotenv';
@@ -61,7 +61,6 @@ async function autoLiquidity(
       pair,
     );
     oldDepositedEvents = depositEvents;
-    await thankYouThykofMAS(client, 10_000_000n);
     return;
   }
 

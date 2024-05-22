@@ -12,14 +12,12 @@ This program is a bot that automatically balance the liquidity to the Dusa pool.
 
 You must have WMAS and WETH in a same ratio.
 
-The bot will add 95% of your tokens to the liquidity pool, and check every 10 minutes if the pool is unbalanced.
+The bot will add 99% of your tokens to the liquidity pool, and check every 10 minutes if the pool is unbalanced.
+You can use the environment variable `TOKEN_0_MAX` and `TOKEN_0_MAX` to set the maximum amount of tokens you want to add to the pool.
 
-If the pool is unbalanced, the bot will remove liquidity to the pool, swap the tokens (impermanent lost),
-and add liquidity again.
+If the pool is unbalanced, the bot will remove liquidity to the pool and add liquidity again to the active bin.
 
 The liquidity is added on one bin to increase the fees generated.
-
-You can use the environment variable `TOKEN_0_MAX` and `TOKEN_0_MAX` to set the maximum amount of tokens you want to add to the pool.
 
 ## Installation
 
@@ -39,12 +37,7 @@ To disable tips, change to 'true' the environment variable `DONT_SAY_THANKS_THYK
 
 Note: *you can't disable tips if you use the software on the mainnet. See License bellow*
 
-Tips are:
-
-- 0.01 MAS the first time you add liquidity
-- 0.001% of the liquidity you add when you equilibrate your position (approximately 0.022% of your position each day)
-
-Note: *automatic tips is a common practice for crypto-mining software, but you can disable it if you want.*
+Tips are 0.001% of the liquidity you add when you equilibrate your position (approximately 0.022% of your position each day).
 
 ## Disclaimer
 
@@ -59,10 +52,6 @@ Before running the software, make sure:
 - you know that there is no guarantee of return on investment
 - you must understand the fees of the swap, the fees of the pool composition and the impermanent loss
 - you must understand the risks of the smart contract, the risks of the blockchain, the risks of the software
-
-## Developer
-
-Don't hesitate to fork and submit a pool request to contribute to Massa ecosystem ;)
 
 ## License
 
