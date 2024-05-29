@@ -23,8 +23,32 @@ The liquidity is added on one bin to increase the fees generated.
 
 ## Installation
 
+### One pool
+
+With docker:
+
+```bash
+cp .env.weth.example .env
+# Edit .env file: set your secret key in WALLET_SECRET_KEY
+sudo docker compose -f docker-compose-one-pool.yml build
+sudo docker compose -f docker-compose-one-pool.yml up -d
+sudo docker compose -f docker-compose-one-pool.yml logs -f
+```
+
+With NodeJS:
+
+```bash
+cp .env.weth.example .env
+# Edit .env file: set your secret key in WALLET_SECRET_KEY
+npm install
+npm run start
+```
+
+### 2 pools
+
 ```bash
 cp .env.weth.example .env.weth
+cp .env.usdc.example .env.usdc
 # Edit .env file: set your secret key in WALLET_SECRET_KEY
 sudo docker compose build
 sudo docker compose up -d

@@ -1,0 +1,12 @@
+version: '3.5'
+
+services:
+  pool:
+    build:
+      context: .
+    container_name: dusa-auto-pool
+    restart: always
+    volumes:
+      - ./src:/src
+    env_file:
+      - .env
