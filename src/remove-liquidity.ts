@@ -14,8 +14,8 @@ import {
 } from '@dusalabs/sdk';
 import { Client, IAccount } from '@massalabs/massa-web3';
 import { getClient, waitOp } from './utils';
-import { config } from 'dotenv';
 import { getBinsData, PAIR_TO_BIN_STEP } from './dusa-utils';
+import { config } from 'dotenv';
 config();
 
 const CHAIN_ID = ChainId.MAINNET;
@@ -38,7 +38,8 @@ export async function removeLiquidity(
   const address = account.address!;
 
   // set amount slippage tolerance
-  const allowedAmountSlippage = 50; // in bips, 0.5% in this case
+  const allowedAmountSlippage =
+    parseInt(process.env.ALLOWED_AMOUNT_SLIPPAGE || '50') || 50; // in bips
 
   // set deadline for the transaction
   const currentTimeInMs = new Date().getTime();

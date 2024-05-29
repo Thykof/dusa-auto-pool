@@ -18,9 +18,9 @@ import {
 import { Client, IAccount } from '@massalabs/massa-web3';
 // import { getClient } from './client';
 import { getClient, waitOp } from './utils';
-import { config } from 'dotenv';
 import { PAIR_TO_BIN_STEP } from './dusa-utils';
 import { increaseAllowanceIfNeeded } from './allowance';
+import { config } from 'dotenv';
 config();
 
 const CHAIN_ID = ChainId.MAINNET;
@@ -39,10 +39,12 @@ export async function addLiquidity(
   pair: PairV2,
 ) {
   // set amount slippage tolerance
-  const allowedAmountSlippage = 50; // in bips
+  const allowedAmountSlippage =
+    parseInt(process.env.ALLOWED_AMOUNT_SLIPPAGE || '50') || 50; // in bips
 
   // set price slippage tolerance
-  const allowedPriceSlippage = 50; // in bips
+  const allowedPriceSlippage =
+    parseInt(process.env.ALLOWED_PRICE_SLIPPAGE || '50') || 50; // in bips
 
   // set deadline for the transaction
   const currentTimeInMs = new Date().getTime();

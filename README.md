@@ -15,11 +15,14 @@ If the pool is unbalanced, the bot will remove liquidity to the pool and add liq
 
 The bot will increase allowance to the router contract if needed.
 
+The liquidity is added on one bin to increase the fees generated.
+
 ## Parameters
 
 You can use the environment variable `TOKEN_0_MAX` and `TOKEN_0_MAX` to set the maximum amount of tokens you want to add to the pool.
 
-The liquidity is added on one bin to increase the fees generated.
+You can customize the slippage with the environment variables `ALLOWED_AMOUNT_SLIPPAGE` and `ALLOWED_PRICE_SLIPPAGE`.
+Default values are 50 bips (0.5%).
 
 ## Installation
 
