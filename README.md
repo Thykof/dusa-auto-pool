@@ -10,12 +10,14 @@ If you want to stake with your own node, you can use this <https://github.com/pe
 
 This program is a bot that automatically balance the liquidity to the Dusa pool.
 
-You must have WMAS and WETH in a same ratio.
-
-The bot will add 99% of your tokens to the liquidity pool, and check every 10 minutes if the pool is unbalanced.
-You can use the environment variable `TOKEN_0_MAX` and `TOKEN_0_MAX` to set the maximum amount of tokens you want to add to the pool.
-
+The bot will add 99% of your tokens to the liquidity pool, and check every 5 minutes if the pool is unbalanced.
 If the pool is unbalanced, the bot will remove liquidity to the pool and add liquidity again to the active bin.
+
+The bot will increase allowance to the router contract if needed.
+
+## Parameters
+
+You can use the environment variable `TOKEN_0_MAX` and `TOKEN_0_MAX` to set the maximum amount of tokens you want to add to the pool.
 
 The liquidity is added on one bin to increase the fees generated.
 

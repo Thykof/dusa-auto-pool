@@ -20,6 +20,7 @@ import { Client, IAccount } from '@massalabs/massa-web3';
 import { getClient, waitOp } from './utils';
 import { config } from 'dotenv';
 import { PAIR_TO_BIN_STEP } from './dusa-utils';
+import { increaseAllowanceIfNeeded } from './allowance';
 config();
 
 const CHAIN_ID = ChainId.MAINNET;
@@ -76,11 +77,25 @@ export async function addLiquidity(
     deadline,
   });
 
+  // increase allowance
+  await increaseAllowanceIfNeeded(
+    client,
+    account,
+    pair.token0.address,
+    tokenAmount0.raw,
+  );
+  await increaseAllowanceIfNeeded(
+    client,
+    account,
+    pair.token1.address,
+    tokenAmount1.raw,
+  );
+
   // add liquidity
-  console.log(`-----Adding liquidity ${tokenAmount0.raw} ${tokenAmount1.raw}`);
-  const txId = await new IRouter(router, client).add(params);
-  console.log('txId add liquidity', txId);
-  const { status, events } = await waitOp(client, txId, false);
+  console.log(`===== Adding liquidity ${tokenAmount0.raw} ${tokenAmount1.raw}`);
+  const opId = await new IRouter(router, client).add(params);
+  console.log('OpId add liquidity', opId);
+  const { status, events } = await waitOp(client, opId, false);
   console.log('status: ', status);
   let compositionFeeEvent: CompositionFeeEvent | undefined;
   const depositEvents: LiquidityEvent[] = [];
