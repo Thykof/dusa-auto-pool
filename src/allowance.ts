@@ -9,7 +9,6 @@ import { getClient, waitOp } from './utils';
 import { config } from 'dotenv';
 config();
 
-const fee = 0n;
 const coins = fromMAS('0');
 const operatorAddress = 'AS12UMSUxgpRBB6ArZDJ19arHoxNkkpdfofQGekAiAJqsuE6PEFJy'; // Dusa Router mainnet
 
@@ -38,7 +37,7 @@ export async function increaseAllowance(
     `Allowing ${operatorAddress} to spend ${amount} on ${contractAddress}`,
   );
   const opId = await client.smartContracts().callSmartContract({
-    fee,
+    fee: await client.publicApi().getMinimalFees(),
     coins,
     targetAddress: contractAddress,
     targetFunction: 'increaseAllowance',
@@ -59,7 +58,7 @@ export async function decreaseAllowance(
     `Decreasing allowance of ${operatorAddress} by ${amount} on ${contractAddress}`,
   );
   const opId = await client.smartContracts().callSmartContract({
-    fee,
+    fee: await client.publicApi().getMinimalFees(),
     coins,
     targetAddress: contractAddress,
     targetFunction: 'decreaseAllowance',

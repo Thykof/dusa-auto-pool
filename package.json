@@ -33,7 +33,7 @@
         "node": ">=16"
     },
     "dependencies": {
-        "@dusalabs/sdk": "^0.5.13",
+        "@dusalabs/sdk": "^0.5.20",
         "@massalabs/wallet-provider": "^2.0.1-dev"
     }
 }
