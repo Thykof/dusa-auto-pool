@@ -10,7 +10,7 @@
         "types": ["node"],
         "noEmit": true,
     },
-    "include": ["./*.ts"],
+    "include": ["./**/*.ts"],
     "exclude": ["node_modules"],
     "experimentalDecorators": true,
     "ts-node": {

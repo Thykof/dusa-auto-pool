@@ -21,6 +21,7 @@ import { getClient, waitOp } from './utils';
 import { PAIR_TO_BIN_STEP } from './dusa-utils';
 import { increaseAllowanceIfNeeded } from './allowance';
 import { config } from 'dotenv';
+import { getAmountsToAdd } from './equilibrateBalances';
 config();
 
 const CHAIN_ID = ChainId.MAINNET;
@@ -83,13 +84,13 @@ export async function addLiquidity(
   await increaseAllowanceIfNeeded(
     client,
     account,
-    pair.token0.address,
+    pair.token0,
     tokenAmount0.raw,
   );
   await increaseAllowanceIfNeeded(
     client,
     account,
-    pair.token1.address,
+    pair.token1,
     tokenAmount1.raw,
   );
 
@@ -105,13 +106,9 @@ export async function addLiquidity(
     const data = l.data;
     if (data.startsWith('COMPOSITION_FEE:')) {
       compositionFeeEvent = EventDecoder.decodeCompositionFee(data);
-      console.log('COMPOSITION_FEE: ', compositionFeeEvent);
     } else if (data.startsWith('DEPOSITED_TO_BIN:')) {
       const depositEvent = EventDecoder.decodeLiquidity(data);
       depositEvents.push(depositEvent);
-      console.log('DEPOSITED_TO_BIN: ', depositEvent);
-    } else {
-      console.log(data);
     }
   });
 
@@ -121,19 +118,25 @@ export async function addLiquidity(
 async function main() {
   const { client, account } = await getClient(process.env.WALLET_SECRET_KEY!);
 
-  const tokenAmount1 = new TokenAmount(USDC, parseUnits('10', USDC.decimals));
-  const tokenAmount2 = new TokenAmount(WMAS, parseUnits('100', WMAS.decimals));
   const pair = new PairV2(USDC, WMAS);
   const binStep = PAIR_TO_BIN_STEP['USDC-WMAS'];
 
-  await addLiquidity(
+  const { amount0, amount1 } = await getAmountsToAdd(
+    client,
+    account,
+    pair.token0,
+    pair.token1,
+  );
+
+  const { depositEvents } = await addLiquidity(
     binStep,
     client,
     account,
-    tokenAmount1,
-    tokenAmount2,
+    amount0,
+    amount1,
     pair,
   );
+  depositEvents.map(console.log);
 }
 
-// await main();
+await main();

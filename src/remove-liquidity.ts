@@ -92,12 +92,8 @@ export async function removeLiquidity(
     if (data.startsWith('WITHDRAWN_FROM_BIN:')) {
       const withdrawEvent = EventDecoder.decodeLiquidity(data);
       withdrawEvents.push(withdrawEvent);
-      console.log('WITHDRAWN_FROM_BIN: ', withdrawEvent);
     } else if (data.startsWith('FEES_COLLECTED:')) {
       feesCollectedEvent = EventDecoder.decodeCollectFees(data);
-      console.log('FEES_COLLECTED: ', feesCollectedEvent);
-    } else {
-      console.log(data);
     }
   });
 
@@ -107,10 +103,10 @@ export async function removeLiquidity(
 async function main() {
   const { client, account } = await getClient(process.env.WALLET_SECRET_KEY!);
 
-  // const pair = new PairV2(USDC, WMAS);
-  // const binStep = PAIR_TO_BIN_STEP['USDC-WMAS'];
-  const pair = new PairV2(WETH, WMAS);
-  const binStep = PAIR_TO_BIN_STEP['WETH-WMAS'];
+  const pair = new PairV2(USDC, WMAS);
+  const binStep = PAIR_TO_BIN_STEP['USDC-WMAS'];
+  // const pair = new PairV2(WETH, WMAS);
+  // const binStep = PAIR_TO_BIN_STEP['WETH-WMAS'];
 
   const { activeBinId, pairContract, userPositionIds } = await getBinsData(
     binStep,
@@ -119,7 +115,7 @@ async function main() {
     pair,
   );
 
-  await removeLiquidity(
+  const { feesCollectedEvent, withdrawEvents } = await removeLiquidity(
     binStep,
     client,
     account,
@@ -128,6 +124,9 @@ async function main() {
     pairContract,
     userPositionIds,
   );
+
+  console.log('feesCollectedEvent: ', feesCollectedEvent);
+  console.log('withdrawEvents: ', withdrawEvents);
 }
 
 // await main();

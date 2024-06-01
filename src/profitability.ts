@@ -8,6 +8,7 @@ import {
   USDC as _USDC,
   PairV2,
   TokenAmount,
+  Token,
   LiquidityEvent,
 } from '@dusalabs/sdk';
 import fs from 'fs';
@@ -54,15 +55,30 @@ export async function profitability(
   collectedFees?: CollectFeesEvent,
 ) {
   // #1 composition fees and collected fees
-  const { rewardsX, rewardsY } = totalRewards(compositionFees, collectedFees);
-  console.log('rewards X', rewardsX);
-  console.log('rewards Y', rewardsY);
   const token0isX = pair.token0.sortsBefore(pair.token1);
   // we want to trade X to Y
   const inputToken = token0isX ? pair.token0 : pair.token1;
   const outputToken = token0isX ? pair.token1 : pair.token0;
   const tokenX = token0isX ? pair.token0 : pair.token1; // WETH
   const tokenY = token0isX ? pair.token1 : pair.token0; // WMAS
+  const { rewardsX, rewardsY } = totalRewards(
+    tokenX,
+    tokenY,
+    collectedFees,
+    compositionFees,
+  );
+  console.log(
+    'rewards X',
+    `${new TokenAmount(tokenX, rewardsX).toSignificant(tokenX.decimals)} ${
+      tokenX.symbol
+    }`,
+  );
+  console.log(
+    'rewards Y',
+    `${new TokenAmount(tokenY, rewardsY).toSignificant(tokenY.decimals)} ${
+      tokenY.symbol
+    }`,
+  );
   let removedAmountIn = new TokenAmount(tokenX, rewardsX);
 
   let feesGains = rewardsY;
@@ -111,8 +127,18 @@ export async function profitability(
       (acc, curr) => acc + curr.amountY,
       0n,
     );
-    console.log('withdrawAmountX', withdrawAmountX);
-    console.log('withdrawAmountY', withdrawAmountY);
+    console.log(
+      'withdrawAmountX',
+      `${new TokenAmount(tokenX, withdrawAmountX).toSignificant(
+        tokenX.decimals,
+      )} ${tokenX.symbol}`,
+    );
+    console.log(
+      'withdrawAmountY',
+      `${new TokenAmount(tokenY, withdrawAmountY).toSignificant(
+        tokenY.decimals,
+      )} ${tokenY.symbol}`,
+    );
 
     let removedAmountY = 0n;
     if (withdrawAmountX > 0n) {
@@ -126,7 +152,12 @@ export async function profitability(
       removedAmountY = bestTrade.outputAmount.raw;
     }
     const totalRemoved = removedAmountY + withdrawAmountY;
-    console.log('totalRemoved', totalRemoved);
+    console.log(
+      'totalRemoved',
+      `${new TokenAmount(tokenY, totalRemoved).toSignificant(
+        tokenY.decimals,
+      )} ${tokenY.symbol}`,
+    );
 
     // get the added liquidity and convert into Y
     if (depositedEvents.length === 0) {
@@ -141,8 +172,18 @@ export async function profitability(
       (acc, curr) => acc + curr.amountY,
       0n,
     );
-    console.log('addedAmountX', addedAmountX);
-    console.log('addedAmountY', addedAmountY);
+    console.log(
+      'addedAmountX',
+      `${new TokenAmount(tokenX, addedAmountX).toSignificant(
+        tokenX.decimals,
+      )} ${tokenX.symbol}`,
+    );
+    console.log(
+      'addedAmountY',
+      `${new TokenAmount(tokenY, addedAmountY).toSignificant(
+        tokenY.decimals,
+      )} ${tokenY.symbol}`,
+    );
 
     let addedY = 0n;
     if (addedAmountX > 0n) {
@@ -156,7 +197,12 @@ export async function profitability(
       addedY = bestTrade.outputAmount.raw;
     }
     const totalAdded = addedY + addedAmountY;
-    console.log('totalAdded', totalAdded);
+    console.log(
+      'totalAdded',
+      `${new TokenAmount(tokenY, totalAdded).toSignificant(tokenY.decimals)} ${
+        tokenY.symbol
+      }`,
+    );
 
     // log impermanent loss
     impermanentLoss = totalAdded - totalRemoved;
@@ -198,11 +244,41 @@ export async function profitability(
 }
 
 function totalRewards(
-  compositionFees?: CompositionFeeEvent,
+  tokenX: Token,
+  tokenY: Token,
   collectedFees?: CollectFeesEvent,
+  compositionFees?: CompositionFeeEvent,
 ) {
-  console.log('composition fees', compositionFees);
-  console.log('collected fees', collectedFees);
+  if (compositionFees) {
+    console.log(
+      'composition fees X',
+      `${new TokenAmount(tokenX, compositionFees.activeFeeX).toSignificant(
+        tokenX.decimals,
+      )} ${tokenX.symbol}`,
+    );
+    console.log(
+      'composition fees Y',
+      `${new TokenAmount(tokenY, compositionFees.activeFeeY).toSignificant(
+        tokenY.decimals,
+      )} ${tokenY.symbol}`,
+    );
+  }
+
+  if (collectedFees) {
+    console.log(
+      'collected fees X',
+      `${new TokenAmount(tokenX, collectedFees.amountX).toSignificant(
+        tokenX.decimals,
+      )} ${tokenX.symbol}`,
+    );
+    console.log(
+      'collected fees Y',
+      `${new TokenAmount(tokenY, collectedFees.amountY).toSignificant(
+        tokenY.decimals,
+      )} ${tokenY.symbol}`,
+    );
+  }
+
   const rewardsX =
     (collectedFees?.amountX || 0n) - (compositionFees?.activeFeeX || 0n);
   const rewardsY =

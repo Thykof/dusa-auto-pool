@@ -1,4 +1,4 @@
-import { Token } from '@dusalabs/sdk';
+import { Token, TokenAmount } from '@dusalabs/sdk';
 import { Args, Client } from '@massalabs/massa-web3';
 import { config } from 'dotenv';
 import { waitOp } from './utils';
@@ -23,7 +23,11 @@ export async function thankYouThykofToken(
     parameter: new Args().addString(thykofAddress).addU256(amount).serialize(),
     fee: await client.publicApi().getMinimalFees(),
   });
-  console.log(`Sending ${amount} ${token.symbol} to Thykof, op id ${opId}`);
+  console.log(
+    `Sending ${new TokenAmount(token, amount).toSignificant(token.decimals)} ${
+      token.symbol
+    } to Thykof, op id ${opId}`,
+  );
   const { status } = await waitOp(client, opId, false);
   console.log('status: ', status);
 }
