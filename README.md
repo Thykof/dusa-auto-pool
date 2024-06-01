@@ -70,26 +70,26 @@ You can now run the bot with docker or npm.
 For one pool:
 
 ```bash
-#build the bot
+# build the bot
 sudo docker compose -f docker-compose-one-pool.yml build
-#run the bot
+# run the bot
 sudo docker compose -f docker-compose-one-pool.yml up -d
-#check the logs
+# check the logs
 sudo docker compose -f docker-compose-one-pool.yml logs -f
-#stop the bot
+# stop the bot
 sudo docker compose -f docker-compose-one-pool.yml down
 ```
 
 For 2 pools:
 
 ```bash
-#build the bot
+# build the bot
 sudo docker compose build
-#run the bot
+# run the bot
 sudo docker compose up -d
-#check the logs
+# check the logs
 sudo docker compose logs -f
-#stop the bot
+# stop the bot
 sudo docker compose down
 ```
 
@@ -101,6 +101,14 @@ This method works only for one pool.
 npm install
 npm run start
 ```
+
+## Updating
+
+```bash
+git pull
+```
+
+If you use docker to run the bot you need to stop and build, then run.
 
 ### **Happy Dusaing!**
 
