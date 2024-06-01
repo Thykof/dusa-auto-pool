@@ -139,4 +139,4 @@ async function main() {
   depositEvents.map(console.log);
 }
 
-await main();
+// await main();
