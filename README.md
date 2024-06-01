@@ -8,14 +8,17 @@ If you want to stake with your own node, you can use this <https://github.com/pe
 
 ## Description
 
-This program is a bot that automatically balance the liquidity to the Dusa pool.
+This program is a bot that adds and automatically rebalances liquidity to one or two Dusa pools: WETH-WMAS and USDC-WMAS.
 
-The bot will add 99% of your tokens to the liquidity pool, and check every 5 minutes if the pool is unbalanced.
-If the pool is unbalanced, the bot will remove liquidity to the pool and add liquidity again to the active bin.
+The bot will start by adding 99% of your available tokens to the liquidity pool. It is designed to add all liquidity in
+the center bin in order to increase the generated fees. The bot will then check every 5 minutes if the added liquidity
+is out of range. In that case the bot will rebalance the liquidity by first removing it and re-adding it to the active
+bin.
 
-The bot will increase allowance to the router contract if needed.
+The bot will increase allowance to the router contract for the relevant tokens when needed.
 
-The liquidity is added on one bin to increase the fees generated.
+Please note that the bot needs MAS wrapped into WMAS to work, don't forget to manually wrap the amount of MAS you want
+to be available to the bot using the wrap function on Dusa.
 
 ## Parameters
 
@@ -26,36 +29,77 @@ Default values are 50 bips (0.5%).
 
 ## Installation
 
+First, you need to clone the dusa-auto-pool folder from Github on your server by running the following command:
+
+```bash
+git clone https://github.com/Thykof/dusa-auto-pool.git
+cd dusa-auto-pool
+```
+
+You then have to decide if you are going to run the bot on one or two of the pools available:
+
+- WMAS-WETH
+- WMAS-USDC
+
+If you choose to run the bot on one pool, you will create a `.env` file copying the relevant template
+(`.env.weth.example` or `.env.usdc.example`). If you go for two pools, you will create two files: `.env.weth` and
+`.env.usdc`.
+
 ### One pool
 
-With docker:
-
 ```bash
 cp .env.weth.example .env
-# Edit .env file: set your secret key in WALLET_SECRET_KEY
-sudo docker compose -f docker-compose-one-pool.yml build
-sudo docker compose -f docker-compose-one-pool.yml up -d
-sudo docker compose -f docker-compose-one-pool.yml logs -f
 ```
 
-With NodeJS:
-
-```bash
-cp .env.weth.example .env
-# Edit .env file: set your secret key in WALLET_SECRET_KEY
-npm install
-npm run start
-```
-
-### 2 pools
+### Two pools
 
 ```bash
 cp .env.weth.example .env.weth
 cp .env.usdc.example .env.usdc
-# Edit .env file: set your secret key in WALLET_SECRET_KEY
+```
+
+You can now edit the .env file(s) adding your private key in the field WALLET_SECRET_KEY and entering the values for the
+optional parameters if needed.
+
+### Running the bot
+
+You can now run the bot with docker or npm.
+
+#### Docker
+
+For one pool:
+
+```bash
+#build the bot
+sudo docker compose -f docker-compose-one-pool.yml build
+#run the bot
+sudo docker compose -f docker-compose-one-pool.yml up -d
+#check the logs
+sudo docker compose -f docker-compose-one-pool.yml logs -f
+#stop the bot
+sudo docker compose -f docker-compose-one-pool.yml down
+```
+
+For 2 pools:
+
+```bash
+#build the bot
 sudo docker compose build
+#run the bot
 sudo docker compose up -d
+#check the logs
 sudo docker compose logs -f
+#stop the bot
+sudo docker compose down
+```
+
+#### NodeJS
+
+This method works only for one pool.
+
+```bash
+npm install
+npm run start
 ```
 
 ### **Happy Dusaing!**
