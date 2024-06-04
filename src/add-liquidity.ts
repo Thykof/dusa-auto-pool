@@ -6,6 +6,7 @@ import {
   PairV2,
   TokenAmount,
   WMAS as _WMAS,
+  WETH as _WETH,
   USDC as _USDC,
   parseUnits,
   Percent,
@@ -28,6 +29,7 @@ const CHAIN_ID = ChainId.MAINNET;
 
 const WMAS = _WMAS[CHAIN_ID];
 const USDC = _USDC[CHAIN_ID];
+const WETH = _WETH[CHAIN_ID];
 
 const router = LB_ROUTER_ADDRESS[CHAIN_ID];
 
@@ -118,8 +120,14 @@ export async function addLiquidity(
 async function main() {
   const { client, account } = await getClient(process.env.WALLET_SECRET_KEY!);
 
-  const pair = new PairV2(USDC, WMAS);
-  const binStep = PAIR_TO_BIN_STEP['USDC-WMAS'];
+  // const pair = new PairV2(USDC, WMAS);
+  // const binStep = PAIR_TO_BIN_STEP['USDC-WMAS'];
+
+  const pair = new PairV2(WETH, WMAS);
+  const binStep = PAIR_TO_BIN_STEP['WETH-WMAS'];
+  console.log('token 0: ' + pair.token0.name);
+  console.log('token 1: ' + pair.token1.name);
+  process.exit(0);
 
   const { amount0, amount1 } = await getAmountsToAdd(
     client,
@@ -139,4 +147,4 @@ async function main() {
   depositEvents.map(console.log);
 }
 
-// await main();
+await main();
