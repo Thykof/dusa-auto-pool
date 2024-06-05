@@ -127,7 +127,6 @@ async function main() {
   const binStep = PAIR_TO_BIN_STEP['WETH-WMAS'];
   console.log('token 0: ' + pair.token0.name);
   console.log('token 1: ' + pair.token1.name);
-  process.exit(0);
 
   const { amount0, amount1 } = await getAmountsToAdd(
     client,
@@ -147,4 +146,4 @@ async function main() {
   depositEvents.map(console.log);
 }
 
-await main();
+// await main();
