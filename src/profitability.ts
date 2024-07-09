@@ -332,5 +332,3 @@ async function main() {
 }
 
 // await main();
-const pair = new PairV2(WMAS, USDC);
-console.log(!pair.tokenA.equals(WMAS));
