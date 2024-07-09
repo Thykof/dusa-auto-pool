@@ -8,7 +8,7 @@ If you want to stake with your own node, you can use this <https://github.com/pe
 
 ## Description
 
-This program is a bot that adds and automatically rebalances liquidity to one or two Dusa pools: WETH-WMAS and USDC-WMAS.
+This program is a bot that adds and automatically rebalances liquidity to one or two Dusa pools: WETH-WMAS and WMAS-USDC.
 
 The bot will start by adding 99% of your available tokens to the liquidity pool. It is designed to add all liquidity in
 the center bin in order to increase the generated fees. The bot will then check every 5 minutes if the added liquidity
@@ -22,14 +22,14 @@ to be available to the bot using the wrap function on Dusa.
 
 ## Parameters
 
-You can use the environment variable `TOKEN_0_MAX` and `TOKEN_0_MAX` to set the maximum amount of tokens you want to add to the pool. Enter the amount in the lowest unit of the token.
+You can use the environment variable `TOKEN_A_MAX` and `TOKEN_A_MAX` to set the maximum amount of tokens you want to add to the pool. Enter the amount in the lowest unit of the token.
 
 For pool WETH-WMAS:
 
 - token 0: Wrapped Ether, for 1WETH, enter 1000000000000000000
 - token 1: Wrapped Massa, for 1WMAS, enter 1000000000
 
-For pool USDC-WMAS:
+For pool WMAS-USDC:
 
 - token 0: Wrapped Massa, for 1WMAS, enter 1000000000
 - token 1: USD Coin, for 1USDC, enter 1000000

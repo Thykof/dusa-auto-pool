@@ -46,18 +46,18 @@ async function autoLiquidity(
 
   if (totalUserSupplies === 0n) {
     console.log("no liquidity, let's add some");
-    const { amount0, amount1 } = await getAmountsToAdd(
+    const { amountA, amountB } = await getAmountsToAdd(
       client,
       account,
-      pair.token0,
-      pair.token1,
+      pair.tokenA,
+      pair.tokenB,
     );
     const { depositEvents } = await addLiquidity(
       binStep,
       client,
       account,
-      amount0,
-      amount1,
+      amountA,
+      amountB,
       pair,
     );
     oldDepositedEvents = depositEvents;
@@ -79,22 +79,22 @@ async function autoLiquidity(
       userPositionIds,
     );
 
-    const { amount0, amount1 } = await getAmountsToAdd(
+    const { amountA, amountB } = await getAmountsToAdd(
       client,
       account,
-      pair.token0,
-      pair.token1,
+      pair.tokenA,
+      pair.tokenB,
     );
 
-    await thankYouThykofToken(client, pair.token0, amount0.raw / 100_000n);
-    await thankYouThykofToken(client, pair.token1, amount1.raw / 100_000n);
+    await thankYouThykofToken(client, pair.tokenA, amountA.raw / 100_000n);
+    await thankYouThykofToken(client, pair.tokenB, amountB.raw / 100_000n);
 
     const { compositionFeeEvent, depositEvents } = await addLiquidity(
       binStep,
       client,
       account,
-      amount0,
-      amount1,
+      amountA,
+      amountB,
       pair,
     );
 
@@ -132,10 +132,10 @@ async function main() {
     setInterval(async () => {
       await autoLiquidity(binStep, client, account, pair);
     }, interval);
-  } else if (process.env.PAIR === 'USDC-WMAS') {
-    console.log('USDC-WMAS');
-    const pair = new PairV2(USDC, WMAS);
-    const binStep = PAIR_TO_BIN_STEP['USDC-WMAS'];
+  } else if (process.env.PAIR === 'WMAS-USDC') {
+    console.log('WMAS-USDC');
+    const pair = new PairV2(WMAS, USDC);
+    const binStep = PAIR_TO_BIN_STEP['WMAS-USDC'];
     await autoLiquidity(binStep, client, account, pair);
     setInterval(async () => {
       await autoLiquidity(binStep, client, account, pair);

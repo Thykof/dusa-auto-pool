@@ -111,7 +111,7 @@ async function main() {
   const pair = new PairV2(USDC, WMAS);
 
   console.log(await getAllowance(client, contractAddress, account.address!));
-  await increaseAllowance(client, pair.token0, 1n);
+  await increaseAllowance(client, pair.tokenA, 1n);
 }
 
 // await main();

@@ -8,7 +8,6 @@ import {
   WMAS as _WMAS,
   WETH as _WETH,
   USDC as _USDC,
-  parseUnits,
   Percent,
   ILBPair,
   EventDecoder,
@@ -37,8 +36,8 @@ export async function addLiquidity(
   binStep: number,
   client: Client,
   account: IAccount,
-  tokenAmount0: TokenAmount,
-  tokenAmount1: TokenAmount,
+  tokenAmountA: TokenAmount,
+  tokenAmountB: TokenAmount,
   pair: PairV2,
 ) {
   // set amount slippage tolerance
@@ -59,13 +58,15 @@ export async function addLiquidity(
     client,
   ).getReservesAndId();
 
-  const addLiquidityInput = pair.addLiquidityParameters(
+  const addLiquidityInput = await pair.addLiquidityParameters(
+    lbPair.LBPair,
     binStep,
-    tokenAmount0,
-    tokenAmount1,
+    tokenAmountA,
+    tokenAmountB,
     new Percent(BigInt(allowedAmountSlippage)),
     new Percent(BigInt(allowedPriceSlippage)),
     LiquidityDistribution.SPOT,
+    client,
   );
 
   const customDistribution: LiquidityDistributionParams = {
@@ -86,18 +87,24 @@ export async function addLiquidity(
   await increaseAllowanceIfNeeded(
     client,
     account,
-    pair.token0,
-    tokenAmount0.raw,
+    pair.tokenA,
+    tokenAmountA.raw,
   );
   await increaseAllowanceIfNeeded(
     client,
     account,
-    pair.token1,
-    tokenAmount1.raw,
+    pair.tokenB,
+    tokenAmountB.raw,
   );
 
   // add liquidity
-  console.log(`===== Adding liquidity ${tokenAmount0.raw} ${tokenAmount1.raw}`);
+  console.log(
+    `===== Adding liquidity: ${tokenAmountA.toSignificant(
+      tokenAmountA.token.decimals,
+    )} ${tokenAmountA.token.symbol} and ${tokenAmountB.toSignificant(
+      tokenAmountB.token.decimals,
+    )} ${tokenAmountB.token.symbol}`,
+  );
   const opId = await new IRouter(router, client).add(params);
   console.log('OpId add liquidity', opId);
   const { status, events } = await waitOp(client, opId, false);
@@ -121,26 +128,26 @@ async function main() {
   const { client, account } = await getClient(process.env.WALLET_SECRET_KEY!);
 
   // const pair = new PairV2(USDC, WMAS);
-  // const binStep = PAIR_TO_BIN_STEP['USDC-WMAS'];
+  // const binStep = PAIR_TO_BIN_STEP['WMAS-USDC'];
 
   const pair = new PairV2(WETH, WMAS);
   const binStep = PAIR_TO_BIN_STEP['WETH-WMAS'];
-  console.log('token 0: ' + pair.token0.name);
-  console.log('token 1: ' + pair.token1.name);
+  console.log('token 0: ' + pair.tokenA.name);
+  console.log('token 1: ' + pair.tokenB.name);
 
-  const { amount0, amount1 } = await getAmountsToAdd(
+  const { amountA, amountB } = await getAmountsToAdd(
     client,
     account,
-    pair.token0,
-    pair.token1,
+    pair.tokenA,
+    pair.tokenB,
   );
 
   const { depositEvents } = await addLiquidity(
     binStep,
     client,
     account,
-    amount0,
-    amount1,
+    amountA,
+    amountB,
     pair,
   );
   depositEvents.map(console.log);

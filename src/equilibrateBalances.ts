@@ -11,41 +11,41 @@ import { getBalance } from './balance';
 import { config } from 'dotenv';
 config();
 
-const maxToken0 = process.env.TOKEN_0_MAX
-  ? BigInt(process.env.TOKEN_0_MAX)
+const maxTokenA = process.env.TOKEN_A_MAX
+  ? BigInt(process.env.TOKEN_A_MAX)
   : Infinity;
-const maxToken1 = process.env.TOKEN_1_MAX
-  ? BigInt(process.env.TOKEN_1_MAX)
+const maxTokenB = process.env.TOKEN_B_MAX
+  ? BigInt(process.env.TOKEN_B_MAX)
   : Infinity;
 
 export async function getAmountsToAdd(
   client: Client,
   account: IAccount,
-  token0: Token,
-  token1: Token,
+  tokenA: Token,
+  tokenB: Token,
 ) {
-  const newBalanceToken0 = await getBalance(
-    token0.address,
+  const newBalanceTokenA = await getBalance(
+    tokenA.address,
     client,
     account.address!,
   );
-  const newBalanceToken1 = await getBalance(
-    token1.address,
+  const newBalanceTokenB = await getBalance(
+    tokenB.address,
     client,
     account.address!,
   );
 
-  let amount0 = newBalanceToken0 - (newBalanceToken0 / 100n) * 1n;
-  if (typeof maxToken0 === 'bigint' && maxToken0 < amount0) {
-    amount0 = maxToken0;
+  let amountA = newBalanceTokenA - (newBalanceTokenA / 100n) * 1n;
+  if (typeof maxTokenA === 'bigint' && maxTokenA < amountA) {
+    amountA = maxTokenA;
   }
-  let amount1 = newBalanceToken1 - (newBalanceToken1 / 100n) * 1n;
-  if (typeof maxToken1 === 'bigint' && maxToken1 < amount1) {
-    amount1 = maxToken1;
+  let amountB = newBalanceTokenB - (newBalanceTokenB / 100n) * 1n;
+  if (typeof maxTokenB === 'bigint' && maxTokenB < amountB) {
+    amountB = maxTokenB;
   }
 
   return {
-    amount0: new TokenAmount(token0, amount0),
-    amount1: new TokenAmount(token1, amount1),
+    amountA: new TokenAmount(tokenA, amountA),
+    amountB: new TokenAmount(tokenB, amountB),
   };
 }

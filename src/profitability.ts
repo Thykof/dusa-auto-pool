@@ -55,12 +55,12 @@ export async function profitability(
   collectedFees?: CollectFeesEvent,
 ) {
   // #1 composition fees and collected fees
-  const token0isX = pair.token0.sortsBefore(pair.token1);
   // we want to trade X to Y
-  const inputToken = token0isX ? pair.token0 : pair.token1;
-  const outputToken = token0isX ? pair.token1 : pair.token0;
-  const tokenX = token0isX ? pair.token0 : pair.token1; // WETH
-  const tokenY = token0isX ? pair.token1 : pair.token0; // WMAS
+  const tokenAisX = !pair.tokenA.equals(WMAS);
+  const inputToken = tokenAisX ? pair.tokenA : pair.tokenB;
+  const outputToken = tokenAisX ? pair.tokenB : pair.tokenA;
+  const tokenX = tokenAisX ? pair.tokenA : pair.tokenB; // WETH or USDC
+  const tokenY = tokenAisX ? pair.tokenB : pair.tokenA; // WMAS
   const { rewardsX, rewardsY } = totalRewards(
     tokenX,
     tokenY,
@@ -286,41 +286,10 @@ function totalRewards(
   return { rewardsX, rewardsY };
 }
 
-// ---
-
-async function getCurrentRatio(
-  binStep: number,
-  client: Client,
-  account: IAccount,
-  pair: PairV2,
-) {
-  const { pairContract } = await getBinsData(binStep, client, account, pair);
-
-  const lbPair = await pair.fetchLBPair(binStep, client, CHAIN_ID);
-
-  const lbPairData = await new ILBPair(
-    lbPair.LBPair,
-    client,
-  ).getReservesAndId();
-
-  const activeBin = lbPairData.activeId;
-
-  const bins = await pairContract.getBins([activeBin]);
-
-  const ratioXY = bins[0].reserveX / bins[0].reserveY;
-
-  return ratioXY;
-}
-
 async function main() {
   const { client, account } = await getClient(process.env.WALLET_SECRET_KEY!);
   const pair = new PairV2(WETH, WMAS);
-  const binStep = PAIR_TO_BIN_STEP['WETH-WMAS'];
-
-  const ratioXY = await getCurrentRatio(binStep, client, account, pair);
-  console.log(ratioXY);
-
-  console.log(WETH.sortsBefore(WMAS));
+  console.log(!pair.tokenA.equals(WMAS));
 
   console.log('===test nothing to trade');
   await profitability(
@@ -363,3 +332,5 @@ async function main() {
 }
 
 // await main();
+const pair = new PairV2(WMAS, USDC);
+console.log(!pair.tokenA.equals(WMAS));

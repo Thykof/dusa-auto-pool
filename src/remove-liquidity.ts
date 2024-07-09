@@ -104,7 +104,7 @@ async function main() {
   const { client, account } = await getClient(process.env.WALLET_SECRET_KEY!);
 
   const pair = new PairV2(USDC, WMAS);
-  const binStep = PAIR_TO_BIN_STEP['USDC-WMAS'];
+  const binStep = PAIR_TO_BIN_STEP['WMAS-USDC'];
   // const pair = new PairV2(WETH, WMAS);
   // const binStep = PAIR_TO_BIN_STEP['WETH-WMAS'];
 
