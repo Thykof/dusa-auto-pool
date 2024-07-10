@@ -16,7 +16,6 @@ import {
   LiquidityEvent,
 } from '@dusalabs/sdk';
 import { Client, IAccount } from '@massalabs/massa-web3';
-// import { getClient } from './client';
 import { getClient, waitOp } from './utils';
 import { PAIR_TO_BIN_STEP } from './dusa-utils';
 import { increaseAllowanceIfNeeded } from './allowance';

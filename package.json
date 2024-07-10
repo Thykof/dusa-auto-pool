@@ -33,6 +33,7 @@
     },
     "dependencies": {
         "@dusalabs/sdk": "^0.6.1",
-        "@massalabs/wallet-provider": "^2.0.1-dev"
+        "@massalabs/wallet-provider": "^2.0.1-dev",
+        "bignumber.js": "^9.1.2"
     }
 }

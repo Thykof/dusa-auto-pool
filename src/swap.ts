@@ -126,9 +126,9 @@ export async function swap(
 
   // execute swap
   console.log(
-    `Swapping ${amountIn.toFixed(9)} ${inputToken.symbol} for ${
-      outputToken.symbol
-    }`,
+    `Swapping ${amountIn.toSignificant(inputToken.decimals)} ${
+      inputToken.symbol
+    } for ${outputToken.symbol}`,
   );
   const txId = await router.swap(params);
   console.log('txId swap', txId);
