@@ -4,6 +4,7 @@
     "description": "",
     "main": "index.js",
     "scripts": {
+        "build": "tsc",
         "start": "npx tsx src/auto-pool.ts",
         "clean": "rimraf build",
         "prettier": "prettier '**/src/**/*.ts' --check && as-prettier --check assembly",

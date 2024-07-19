@@ -46,12 +46,7 @@ async function autoLiquidity(
 
   if (totalUserSupplies === 0n) {
     console.log("no liquidity, let's add some");
-    const { amountA, amountB } = await getAmountsToAdd(
-      client,
-      account,
-      pair.tokenA,
-      pair.tokenB,
-    );
+    const { amountA, amountB } = await getAmountsToAdd(client, account, pair);
     const { depositEvents } = await addLiquidity(
       binStep,
       client,
@@ -79,12 +74,7 @@ async function autoLiquidity(
       userPositionIds,
     );
 
-    const { amountA, amountB } = await getAmountsToAdd(
-      client,
-      account,
-      pair.tokenA,
-      pair.tokenB,
-    );
+    const { amountA, amountB } = await getAmountsToAdd(client, account, pair);
 
     await thankYouThykofToken(client, pair.tokenA, amountA.raw / 100_000n);
     await thankYouThykofToken(client, pair.tokenB, amountB.raw / 100_000n);

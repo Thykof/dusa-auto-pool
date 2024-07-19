@@ -15,7 +15,7 @@ import {
   CompositionFeeEvent,
   LiquidityEvent,
 } from '@dusalabs/sdk';
-import { Client, IAccount } from '@massalabs/massa-web3';
+import { Client, EOperationStatus, IAccount } from '@massalabs/massa-web3';
 import { getClient, waitOp } from './utils';
 import { PAIR_TO_BIN_STEP } from './dusa-utils';
 import { increaseAllowanceIfNeeded } from './allowance';
@@ -136,12 +136,7 @@ async function main() {
   console.log('token 0: ' + pair.tokenA.name);
   console.log('token 1: ' + pair.tokenB.name);
 
-  const { amountA, amountB } = await getAmountsToAdd(
-    client,
-    account,
-    pair.tokenA,
-    pair.tokenB,
-  );
+  const { amountA, amountB } = await getAmountsToAdd(client, account, pair);
 
   const { depositEvents } = await addLiquidity(
     binStep,
