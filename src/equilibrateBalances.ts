@@ -74,16 +74,9 @@ export async function equilibrateBalances(
   const tokenA = pair.tokenA;
   const tokenB = pair.tokenB;
 
-  const balanceTokenA = await getBalance(
-    tokenA.address,
-    client,
-    account.address!,
-  );
-  const balanceTokenB = await getBalance(
-    tokenB.address,
-    client,
-    account.address!,
-  );
+  const { amountA, amountB } = await getAmountsToAdd(client, account, pair);
+  const balanceTokenA = amountA.raw;
+  const balanceTokenB = amountB.raw;
 
   const balanceAWorthInB = BigInt(
     new BigNumber(balanceTokenA.toString())
