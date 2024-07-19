@@ -100,6 +100,13 @@ export async function equilibrateBalances(
     higherBalanceToken,
     higherBalanceAmount - halfValue,
   );
+
+  // don't swap if the difference is low
+  if (amountToSwap.raw < (totalValue * 7n) / 100n) {
+    console.log('Not swapping');
+    return;
+  }
+
   const lowerBalanceToken = higherBalanceToken === tokenA ? tokenB : tokenA;
   const inputToken = higherBalanceToken;
   const outputToken = lowerBalanceToken;
