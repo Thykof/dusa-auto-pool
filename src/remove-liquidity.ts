@@ -12,7 +12,7 @@ import {
   CollectFeesEvent,
   LiquidityEvent,
 } from '@dusalabs/sdk';
-import { Client, IAccount } from '@massalabs/massa-web3';
+import { Client, EOperationStatus, IAccount } from '@massalabs/massa-web3';
 import { getClient, waitOp } from './utils';
 import { getBinsData, PAIR_TO_BIN_STEP } from './dusa-utils';
 import { config } from 'dotenv';
@@ -67,14 +67,16 @@ export async function removeLiquidity(
     new Percent(BigInt(allowedAmountSlippage)),
   );
 
+  const tokens = await pairContract.getTokens();
+
   const params = pair.liquidityCallParameters({
     ...removeLiquidityInput,
     amount0Min: removeLiquidityInput.amountXMin,
     amount1Min: removeLiquidityInput.amountYMin,
     ids: userPositionIds,
     amounts: nonZeroAmounts,
-    token0: '',
-    token1: '',
+    token0: tokens[0],
+    token1: tokens[1],
     binStep,
     to: address,
     deadline,
@@ -94,6 +96,8 @@ export async function removeLiquidity(
       withdrawEvents.push(withdrawEvent);
     } else if (data.startsWith('FEES_COLLECTED:')) {
       feesCollectedEvent = EventDecoder.decodeCollectFees(data);
+    } else if (status === EOperationStatus.SPECULATIVE_ERROR) {
+      console.error('Error removing liquidity: ', l);
     }
   });
 
@@ -129,4 +133,4 @@ async function main() {
   console.log('withdrawEvents: ', withdrawEvents);
 }
 
-// await main();
+await main();

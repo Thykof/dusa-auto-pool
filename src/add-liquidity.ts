@@ -117,6 +117,8 @@ export async function addLiquidity(
     } else if (data.startsWith('DEPOSITED_TO_BIN:')) {
       const depositEvent = EventDecoder.decodeLiquidity(data);
       depositEvents.push(depositEvent);
+    } else if (status === EOperationStatus.SPECULATIVE_ERROR) {
+      console.error('Error adding liquidity: ', l);
     }
   });
 
