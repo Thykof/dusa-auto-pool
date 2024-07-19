@@ -11,7 +11,6 @@ import {
   Percent,
   ILBPair,
   EventDecoder,
-  LiquidityDistributionParams,
   CompositionFeeEvent,
   LiquidityEvent,
 } from '@dusalabs/sdk';
@@ -20,7 +19,9 @@ import { getClient, waitOp } from './utils';
 import { PAIR_TO_BIN_STEP } from './dusa-utils';
 import { increaseAllowanceIfNeeded } from './allowance';
 import { config } from 'dotenv';
-import { getAmountsToAdd } from './equilibrateBalances';
+import { getAmountsToAdd, getCurrentPrice } from './equilibrateBalances';
+import BigNumber from 'bignumber.js';
+import { getCustomDistribution } from './distribution';
 config();
 
 const CHAIN_ID = ChainId.MAINNET;
@@ -38,6 +39,7 @@ export async function addLiquidity(
   tokenAmountA: TokenAmount,
   tokenAmountB: TokenAmount,
   pair: PairV2,
+  prices: { oldPrice: BigNumber; currentPrice: BigNumber },
 ) {
   // set amount slippage tolerance
   const allowedAmountSlippage =
@@ -68,11 +70,10 @@ export async function addLiquidity(
     client,
   );
 
-  const customDistribution: LiquidityDistributionParams = {
-    deltaIds: [0],
-    distributionX: [10n ** 18n],
-    distributionY: [10n ** 18n],
-  };
+  const customDistribution = getCustomDistribution(prices);
+  if (customDistribution.deltaIds.length === 0) {
+    throw Error('abort adding liquidity');
+  }
 
   const params = pair.liquidityCallParameters({
     ...addLiquidityInput,
@@ -128,7 +129,7 @@ export async function addLiquidity(
 async function main() {
   const { client, account } = await getClient(process.env.WALLET_SECRET_KEY!);
 
-  // const pair = new PairV2(USDC, WMAS);
+  // const pair = new PairV2(WMAS, USDC);
   // const binStep = PAIR_TO_BIN_STEP['WMAS-USDC'];
 
   const pair = new PairV2(WETH, WMAS);
@@ -137,6 +138,7 @@ async function main() {
   console.log('token 1: ' + pair.tokenB.name);
 
   const { amountA, amountB } = await getAmountsToAdd(client, account, pair);
+  const currentPrice = await getCurrentPrice(client, pair, binStep);
 
   const { depositEvents } = await addLiquidity(
     binStep,
@@ -145,6 +147,10 @@ async function main() {
     amountA,
     amountB,
     pair,
+    {
+      oldPrice: currentPrice,
+      currentPrice: currentPrice.multipliedBy(1.71),
+    },
   );
   depositEvents.map(console.log);
 }

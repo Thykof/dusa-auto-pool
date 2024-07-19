@@ -37,6 +37,39 @@ For pool WMAS-USDC:
 You can customize the slippage with the environment variables `ALLOWED_AMOUNT_SLIPPAGE` and `ALLOWED_PRICE_SLIPPAGE`.
 Default values are 50 bips (0.5%).
 
+### Pool distribution
+
+You can customize the pool distribution by editing the file `profile.default.json` or by creating another file and
+specifying it in the environment variable `PROFILE_FILE`.
+
+The file must of the format:
+
+```text
+{
+  "<percentage>": {
+    "numBins": 1 or 51,
+    "distribution": "SPOT"
+  }
+}
+```
+
+For now, only SPOT distribution is supported, and only 1 or 51 bins are supported.
+
+By default, the bot will provide to one bin if the price change is less than 30% and to 51 bins if the price change is more than 30%. The bot will stop if the price change is more than 70%. You will need to restart it manually. The goal is to implement strategies and adapt to market condition.
+
+If you are a token creator, you can use the bot to provide liquidity to your token's pool with this profile:
+
+```json
+{
+  "0": {
+    "numBins": 51,
+    "distribution": "SPOT"
+  }
+}
+```
+
+It will always provide to 51 bins around the current price.
+
 ## Installation
 
 First, you need to clone the dusa-auto-pool folder from Github on your server by running the following command:
@@ -48,7 +81,7 @@ cd dusa-auto-pool
 
 You then have to decide if you are going to run the bot on one or two of the pools available:
 
-- WMAS-WETH
+- WETH-WMAS
 - WMAS-USDC
 
 If you choose to run the bot on one pool, you will create a `.env` file copying the relevant template

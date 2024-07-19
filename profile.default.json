@@ -1,0 +1,14 @@
+{
+	"0": {
+		"numBins": 1,
+		"distribution": "SPOT"
+	},
+	"30": {
+		"numBins": 51,
+		"distribution": "SPOT"
+	},
+	"70": {
+		"numBins": 0,
+		"distribution": "SPOT"
+	}
+}

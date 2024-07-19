@@ -4,7 +4,6 @@ import {
   ChainId,
   ILBPair,
   PairV2,
-  Token,
   TokenAmount,
   USDC as _USDC,
   WETH as _WETH,
@@ -70,7 +69,7 @@ export async function equilibrateBalances(
   client: Client,
   account: IAccount,
   pair: PairV2,
-  binStep: number,
+  currentPrice: BigNumber,
 ) {
   const tokenA = pair.tokenA;
   const tokenB = pair.tokenB;
@@ -86,10 +85,9 @@ export async function equilibrateBalances(
     account.address!,
   );
 
-  const currentPrice = await getCurrentPrice(client, pair, binStep);
   const balanceAWorthInB = BigInt(
     new BigNumber(balanceTokenA.toString())
-      .multipliedBy(new BigNumber(currentPrice))
+      .multipliedBy(currentPrice)
       .toFixed(0),
   );
   const totalValue = balanceTokenB + balanceAWorthInB;
@@ -121,7 +119,7 @@ export async function getCurrentPrice(
     client,
   ).getReservesAndId();
 
-  return Bin.getPriceFromId(lbPairData.activeId, binStep);
+  return new BigNumber(Bin.getPriceFromId(lbPairData.activeId, binStep));
 }
 
 async function main() {
@@ -133,9 +131,10 @@ async function main() {
   const pair = new PairV2(WETH, WMAS);
   const binStep = PAIR_TO_BIN_STEP['WETH-WMAS'];
 
-  console.log(await getCurrentPrice(client, pair, binStep));
+  const currentPrice = await getCurrentPrice(client, pair, binStep);
+  console.log(currentPrice);
 
-  equilibrateBalances(client, account, pair, binStep);
+  equilibrateBalances(client, account, pair, currentPrice);
 }
 
 // await main();

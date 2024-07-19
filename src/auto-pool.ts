@@ -16,9 +16,14 @@ import {
   PAIR_TO_BIN_STEP,
 } from './dusa-utils';
 import { thankYouThykofToken } from './transfer';
-import { getAmountsToAdd } from './equilibrateBalances';
+import {
+  equilibrateBalances,
+  getAmountsToAdd,
+  getCurrentPrice,
+} from './equilibrateBalances';
 import { profitability } from './profitability';
 import { config } from 'dotenv';
+import BigNumber from 'bignumber.js';
 config();
 
 const CHAIN_ID = ChainId.MAINNET;
@@ -28,6 +33,7 @@ const USDC = _USDC[CHAIN_ID];
 const WETH = _WETH[CHAIN_ID];
 
 let oldDepositedEvents: LiquidityEvent[] = [];
+let oldPrice: BigNumber;
 
 async function autoLiquidity(
   binStep: number,
@@ -46,6 +52,8 @@ async function autoLiquidity(
 
   if (totalUserSupplies === 0n) {
     console.log("no liquidity, let's add some");
+    oldPrice = await getCurrentPrice(client, pair, binStep);
+    await equilibrateBalances(client, account, pair, oldPrice);
     const { amountA, amountB } = await getAmountsToAdd(client, account, pair);
     const { depositEvents } = await addLiquidity(
       binStep,
@@ -54,6 +62,7 @@ async function autoLiquidity(
       amountA,
       amountB,
       pair,
+      { oldPrice, currentPrice: oldPrice },
     );
     oldDepositedEvents = depositEvents;
     return;
@@ -74,11 +83,14 @@ async function autoLiquidity(
       userPositionIds,
     );
 
+    const currentPrice = await getCurrentPrice(client, pair, binStep);
+    await equilibrateBalances(client, account, pair, currentPrice);
     const { amountA, amountB } = await getAmountsToAdd(client, account, pair);
 
     await thankYouThykofToken(client, pair.tokenA, amountA.raw / 100_000n);
     await thankYouThykofToken(client, pair.tokenB, amountB.raw / 100_000n);
 
+    console.log({ oldPrice, currentPrice: oldPrice }); // DEBUG
     const { compositionFeeEvent, depositEvents } = await addLiquidity(
       binStep,
       client,
@@ -86,6 +98,7 @@ async function autoLiquidity(
       amountA,
       amountB,
       pair,
+      { oldPrice, currentPrice: oldPrice },
     );
 
     try {
@@ -102,6 +115,7 @@ async function autoLiquidity(
     }
 
     oldDepositedEvents = depositEvents;
+    oldPrice = currentPrice;
   } else {
     console.log('Active bin already in position');
   }
