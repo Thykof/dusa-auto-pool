@@ -8,6 +8,7 @@ import {
   WETH as _WETH,
   ChainId,
   LiquidityEvent,
+  Token,
 } from '@dusalabs/sdk';
 import { removeLiquidity } from './remove-liquidity';
 import {
@@ -31,6 +32,13 @@ const CHAIN_ID = ChainId.MAINNET;
 const WMAS = _WMAS[CHAIN_ID];
 const USDC = _USDC[CHAIN_ID];
 const WETH = _WETH[CHAIN_ID];
+const PUR = new Token(
+  ChainId.MAINNET,
+  'AS133eqPPaPttJ6hJnk3sfoG5cjFFqBDi1VGxdo2wzWkq8AfZnan',
+  18,
+  'PUR',
+  'Purrfect Universe',
+);
 
 let oldDepositedEvents: LiquidityEvent[] = [];
 let oldPrice: BigNumber;
@@ -128,8 +136,8 @@ async function main() {
 
   // For now it won't work with multiple pairs that have token in common
 
+  console.log(`Pair: ${process.env.PAIR}`);
   if (process.env.PAIR === 'WETH-WMAS') {
-    console.log('WETH-WMAS');
     const pair = new PairV2(WETH, WMAS);
     const binStep = PAIR_TO_BIN_STEP['WETH-WMAS'];
     await autoLiquidity(binStep, client, account, pair);
@@ -137,9 +145,15 @@ async function main() {
       await autoLiquidity(binStep, client, account, pair);
     }, interval);
   } else if (process.env.PAIR === 'WMAS-USDC') {
-    console.log('WMAS-USDC');
     const pair = new PairV2(WMAS, USDC);
     const binStep = PAIR_TO_BIN_STEP['WMAS-USDC'];
+    await autoLiquidity(binStep, client, account, pair);
+    setInterval(async () => {
+      await autoLiquidity(binStep, client, account, pair);
+    }, interval);
+  } else if (process.env.PAIR === 'PUR-WMAS') {
+    const pair = new PairV2(PUR, WMAS);
+    const binStep = PAIR_TO_BIN_STEP['PUR-WMAS'];
     await autoLiquidity(binStep, client, account, pair);
     setInterval(async () => {
       await autoLiquidity(binStep, client, account, pair);

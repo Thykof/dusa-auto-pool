@@ -16,6 +16,7 @@ export const PAIR_TO_BIN_STEP = {
   'WMAS-USDC': 20,
   'WETH-WMAS': 15,
   'DAI-USDC': 1,
+  'PUR-WMAS': 100,
 };
 
 export async function getBinsData(
