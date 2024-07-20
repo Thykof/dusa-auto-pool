@@ -22,20 +22,22 @@ to be available to the bot using the wrap function on Dusa.
 
 ## Parameters
 
-You can use the environment variable `TOKEN_A_MAX` and `TOKEN_A_MAX` to set the maximum amount of tokens you want to add to the pool. Enter the amount in the lowest unit of the token.
+You can use the environment variable `TOKEN_A_MAX` and `TOKEN_B_MAX` to set the maximum amount of tokens you want to add to the pool. Enter the amount in the lowest unit of the token.
 
 For pool WETH-WMAS:
 
-- token 0: Wrapped Ether, for 1WETH, enter 1000000000000000000
-- token 1: Wrapped Massa, for 1WMAS, enter 1000000000
+- token A: Wrapped Ether, for 1WETH, enter 1000000000000000000
+- token B: Wrapped Massa, for 1WMAS, enter 1000000000
 
 For pool WMAS-USDC:
 
-- token 0: Wrapped Massa, for 1WMAS, enter 1000000000
-- token 1: USD Coin, for 1USDC, enter 1000000
+- token A: Wrapped Massa, for 1WMAS, enter 1000000000
+- token B: USD Coin, for 1USDC, enter 1000000
 
 You can customize the slippage with the environment variables `ALLOWED_AMOUNT_SLIPPAGE` and `ALLOWED_PRICE_SLIPPAGE`.
 Default values are 50 bips (0.5%).
+
+You can change the number of minutes between each check with the environment variable `INTERVAL`. Default value is 5 minutes.
 
 ### Pool distribution
 

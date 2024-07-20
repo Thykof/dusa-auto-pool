@@ -122,35 +122,30 @@ async function autoLiquidity(
 async function main() {
   const { client, account } = await getClient(process.env.WALLET_SECRET_KEY!);
 
-  const interval = 1000 * 60 * 5;
+  const interval = process.env.INTERVAL ? parseInt(process.env.INTERVAL) : 5;
+  const intervalMs = 1000 * 60 * interval;
 
-  // For now it won't work with multiple pairs that have token in common
+  let pair: PairV2;
+  let binStep: number;
 
   console.log(`Pair: ${process.env.PAIR}`);
   if (process.env.PAIR === 'WETH-WMAS') {
-    const pair = new PairV2(WETH, WMAS);
-    const binStep = PAIR_TO_BIN_STEP['WETH-WMAS'];
-    await autoLiquidity(binStep, client, account, pair);
-    setInterval(async () => {
-      await autoLiquidity(binStep, client, account, pair);
-    }, interval);
+    pair = new PairV2(WETH, WMAS);
+    binStep = PAIR_TO_BIN_STEP['WETH-WMAS'];
   } else if (process.env.PAIR === 'WMAS-USDC') {
-    const pair = new PairV2(WMAS, USDC);
-    const binStep = PAIR_TO_BIN_STEP['WMAS-USDC'];
-    await autoLiquidity(binStep, client, account, pair);
-    setInterval(async () => {
-      await autoLiquidity(binStep, client, account, pair);
-    }, interval);
+    pair = new PairV2(WMAS, USDC);
+    binStep = PAIR_TO_BIN_STEP['WMAS-USDC'];
   } else if (process.env.PAIR === 'PUR-WMAS') {
-    const pair = new PairV2(PUR, WMAS);
-    const binStep = PAIR_TO_BIN_STEP['PUR-WMAS'];
-    await autoLiquidity(binStep, client, account, pair);
-    setInterval(async () => {
-      await autoLiquidity(binStep, client, account, pair);
-    }, interval);
+    pair = new PairV2(PUR, WMAS);
+    binStep = PAIR_TO_BIN_STEP['PUR-WMAS'];
   } else {
-    console.error('Invalid pair');
+    throw new Error('Invalid pair');
   }
+
+  await autoLiquidity(binStep, client, account, pair);
+  setInterval(async () => {
+    await autoLiquidity(binStep, client, account, pair);
+  }, intervalMs);
 }
 
 await main();
