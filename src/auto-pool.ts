@@ -36,6 +36,30 @@ const WETH = _WETH[CHAIN_ID];
 let oldDepositedEvents: LiquidityEvent[] = [];
 let oldPrice: BigNumber;
 
+async function provideLiquidity(
+  binStep: number,
+  client: Client,
+  account: IAccount,
+  pair: PairV2,
+) {
+  const currentPrice = await getCurrentPrice(client, pair, binStep);
+  await equilibrateBalances(client, account, pair, oldPrice);
+  const { amountA, amountB } = await getAmountsToAdd(client, account, pair);
+  const { depositEvents, compositionFeeEvent } = await addLiquidity(
+    binStep,
+    client,
+    account,
+    amountA,
+    amountB,
+    pair,
+    { oldPrice, currentPrice: oldPrice },
+  );
+  oldDepositedEvents = depositEvents;
+  oldPrice = currentPrice;
+
+  return { amountA, amountB, compositionFeeEvent };
+}
+
 async function autoLiquidity(
   binStep: number,
   client: Client,
@@ -53,19 +77,7 @@ async function autoLiquidity(
 
   if (totalUserSupplies === 0n) {
     console.log("no liquidity, let's add some");
-    oldPrice = await getCurrentPrice(client, pair, binStep);
-    await equilibrateBalances(client, account, pair, oldPrice);
-    const { amountA, amountB } = await getAmountsToAdd(client, account, pair);
-    const { depositEvents } = await addLiquidity(
-      binStep,
-      client,
-      account,
-      amountA,
-      amountB,
-      pair,
-      { oldPrice, currentPrice: oldPrice },
-    );
-    oldDepositedEvents = depositEvents;
+    await provideLiquidity(binStep, client, account, pair);
     return;
   }
 
@@ -84,23 +96,17 @@ async function autoLiquidity(
       userPositionIds,
     );
 
-    const currentPrice = await getCurrentPrice(client, pair, binStep);
-    await equilibrateBalances(client, account, pair, currentPrice);
-    const { amountA, amountB } = await getAmountsToAdd(client, account, pair);
+    const { amountA, amountB, compositionFeeEvent } = await provideLiquidity(
+      binStep,
+      client,
+      account,
+      pair,
+    );
 
     await thankYouThykofToken(client, pair.tokenA, amountA.raw / 100_000n);
     await thankYouThykofToken(client, pair.tokenB, amountB.raw / 100_000n);
 
     console.log({ oldPrice, currentPrice: oldPrice }); // DEBUG
-    const { compositionFeeEvent, depositEvents } = await addLiquidity(
-      binStep,
-      client,
-      account,
-      amountA,
-      amountB,
-      pair,
-      { oldPrice, currentPrice: oldPrice },
-    );
 
     try {
       await profitability(
@@ -114,9 +120,6 @@ async function autoLiquidity(
     } catch (error) {
       console.error('Error aggregating fees', error);
     }
-
-    oldDepositedEvents = depositEvents;
-    oldPrice = currentPrice;
   } else {
     console.log('Active bin already in position');
   }

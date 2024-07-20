@@ -1,4 +1,4 @@
-import { Client } from '@massalabs/massa-web3';
+import { Client, EOperationStatus } from '@massalabs/massa-web3';
 import { getClient } from './utils';
 import {
   ChainId,
@@ -140,8 +140,8 @@ export async function swap(
     if (data.startsWith('SWAP:')) {
       resultEvent = EventDecoder.decodeSwap(data);
       console.log('SWAP: ', resultEvent);
-    } else {
-      console.log(data);
+    } else if (status === EOperationStatus.SPECULATIVE_ERROR) {
+      console.error('Error swapping: ', l);
     }
   });
   return resultEvent;
