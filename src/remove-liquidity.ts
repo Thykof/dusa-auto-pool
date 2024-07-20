@@ -13,7 +13,7 @@ import {
   LiquidityEvent,
 } from '@dusalabs/sdk';
 import { Client, EOperationStatus, IAccount } from '@massalabs/massa-web3';
-import { getClient, waitOp } from './utils';
+import { getClient, PUR, waitOp } from './utils';
 import { getBinsData, PAIR_TO_BIN_STEP } from './dusa-utils';
 import { config } from 'dotenv';
 config();
@@ -107,10 +107,12 @@ export async function removeLiquidity(
 async function main() {
   const { client, account } = await getClient(process.env.WALLET_SECRET_KEY!);
 
-  const pair = new PairV2(USDC, WMAS);
-  const binStep = PAIR_TO_BIN_STEP['WMAS-USDC'];
+  // const pair = new PairV2(USDC, WMAS);
+  // const binStep = PAIR_TO_BIN_STEP['WMAS-USDC'];
   // const pair = new PairV2(WETH, WMAS);
   // const binStep = PAIR_TO_BIN_STEP['WETH-WMAS'];
+  const pair = new PairV2(PUR, WMAS);
+  const binStep = PAIR_TO_BIN_STEP['PUR-WMAS'];
 
   const { activeBinId, pairContract, userPositionIds } = await getBinsData(
     binStep,

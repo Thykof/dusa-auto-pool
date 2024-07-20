@@ -1,5 +1,5 @@
 import { addLiquidity } from './add-liquidity';
-import { getClient } from './utils';
+import { getClient, PUR } from './utils';
 import { Client, IAccount } from '@massalabs/massa-web3';
 import {
   PairV2,
@@ -32,13 +32,6 @@ const CHAIN_ID = ChainId.MAINNET;
 const WMAS = _WMAS[CHAIN_ID];
 const USDC = _USDC[CHAIN_ID];
 const WETH = _WETH[CHAIN_ID];
-const PUR = new Token(
-  ChainId.MAINNET,
-  'AS133eqPPaPttJ6hJnk3sfoG5cjFFqBDi1VGxdo2wzWkq8AfZnan',
-  18,
-  'PUR',
-  'Purrfect Universe',
-);
 
 let oldDepositedEvents: LiquidityEvent[] = [];
 let oldPrice: BigNumber;

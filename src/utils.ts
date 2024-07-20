@@ -1,3 +1,4 @@
+import { ChainId, Token } from '@dusalabs/sdk';
 import {
   Client,
   EOperationStatus,
@@ -9,6 +10,14 @@ import {
   WalletClient,
   Web3Account,
 } from '@massalabs/massa-web3';
+
+export const PUR = new Token(
+  ChainId.MAINNET,
+  'AS133eqPPaPttJ6hJnk3sfoG5cjFFqBDi1VGxdo2wzWkq8AfZnan',
+  18,
+  'PUR',
+  'Purrfect Universe',
+);
 
 export const getClient = async (
   secretKey: string,
