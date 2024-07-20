@@ -8,4 +8,4 @@ services:
     volumes:
       - ./src:/src
     env_file:
-      - .env
+      - .env.pur

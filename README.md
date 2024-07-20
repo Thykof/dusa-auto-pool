@@ -42,20 +42,24 @@ Default values are 50 bips (0.5%).
 You can customize the pool distribution by editing the file `profile.default.json` or by creating another file and
 specifying it in the environment variable `PROFILE_FILE`.
 
-The file must of the format:
+The goal is to implement strategies and adapt to market condition.
+
+The file must have the format:
 
 ```text
 {
   "<percentage>": {
-    "numBins": 1 or 51,
+    "numBins": 0, or 1 or 51,
     "distribution": "SPOT"
   }
 }
 ```
 
-For now, only SPOT distribution is supported, and only 1 or 51 bins are supported.
+For now, only SPOT distribution is supported, and only 0 or 1 or 51 bins are supported.
 
-By default, the bot will provide to one bin if the price change is less than 30% and to 51 bins if the price change is more than 30%. The bot will stop if the price change is more than 70%. You will need to restart it manually. The goal is to implement strategies and adapt to market condition.
+0 bins meas the bot will stop and not provide liquidity, you will need to restart it manually.
+
+By default, the bot will provide to one bin if the price change is less than 30% and to 51 bins if the price change is more than 30%. The bot will stop if the price change is more than 70%. You will need to restart it manually. 
 
 If you are a token creator, you can use the bot to provide liquidity to your token's pool with this profile:
 
