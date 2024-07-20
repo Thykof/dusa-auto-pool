@@ -8,7 +8,6 @@ import {
   WETH as _WETH,
   ChainId,
   LiquidityEvent,
-  Token,
 } from '@dusalabs/sdk';
 import { removeLiquidity } from './remove-liquidity';
 import {
@@ -17,11 +16,7 @@ import {
   PAIR_TO_BIN_STEP,
 } from './dusa-utils';
 import { thankYouThykofToken } from './transfer';
-import {
-  equilibrateBalances,
-  getAmountsToAdd,
-  getCurrentPrice,
-} from './equilibrateBalances';
+import { getAmountsToAdd, getCurrentPrice } from './equilibrateBalances';
 import { profitability } from './profitability';
 import { config } from 'dotenv';
 import BigNumber from 'bignumber.js';
@@ -43,7 +38,6 @@ async function provideLiquidity(
   pair: PairV2,
 ) {
   const currentPrice = await getCurrentPrice(client, pair, binStep);
-  await equilibrateBalances(client, account, pair, oldPrice);
   const { amountA, amountB } = await getAmountsToAdd(client, account, pair);
   const { depositEvents, compositionFeeEvent } = await addLiquidity(
     binStep,

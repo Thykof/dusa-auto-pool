@@ -19,7 +19,11 @@ import { getClient, waitOp } from './utils';
 import { PAIR_TO_BIN_STEP } from './dusa-utils';
 import { increaseAllowanceIfNeeded } from './allowance';
 import { config } from 'dotenv';
-import { getAmountsToAdd, getCurrentPrice } from './equilibrateBalances';
+import {
+  equilibrateBalances,
+  getAmountsToAdd,
+  getCurrentPrice,
+} from './equilibrateBalances';
 import BigNumber from 'bignumber.js';
 import { getCustomDistribution } from './distribution';
 config();
@@ -73,6 +77,9 @@ export async function addLiquidity(
   const customDistribution = getCustomDistribution(prices);
   if (customDistribution.deltaIds.length === 0) {
     throw Error('abort adding liquidity');
+  }
+  if (customDistribution.deltaIds.length > 1) {
+    await equilibrateBalances(client, account, pair, prices.oldPrice);
   }
 
   const params = pair.liquidityCallParameters({
