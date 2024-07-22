@@ -29,7 +29,7 @@ const USDC = _USDC[CHAIN_ID];
 const WETH = _WETH[CHAIN_ID];
 
 let oldDepositedEvents: LiquidityEvent[] = [];
-let oldPrice: BigNumber;
+let oldPrice: BigNumber | undefined = undefined;
 
 async function provideLiquidity(
   binStep: number,
@@ -46,7 +46,7 @@ async function provideLiquidity(
     amountA,
     amountB,
     pair,
-    { oldPrice, currentPrice: oldPrice },
+    { oldPrice: oldPrice || currentPrice, currentPrice: currentPrice },
   );
   oldDepositedEvents = depositEvents;
   oldPrice = currentPrice;
@@ -99,8 +99,6 @@ async function autoLiquidity(
 
     await thankYouThykofToken(client, pair.tokenA, amountA.raw / 100_000n);
     await thankYouThykofToken(client, pair.tokenB, amountB.raw / 100_000n);
-
-    console.log({ oldPrice, currentPrice: oldPrice }); // DEBUG
 
     try {
       await profitability(
