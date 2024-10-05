@@ -2,7 +2,6 @@ import {
   ChainId,
   CollectFeesEvent,
   CompositionFeeEvent,
-  ILBPair,
   WMAS as _WMAS,
   WETH as _WETH,
   USDC as _USDC,
@@ -13,8 +12,7 @@ import {
 } from '@dusalabs/sdk';
 import fs from 'fs';
 import { getClient } from './utils';
-import { getBinsData, PAIR_TO_BIN_STEP } from './dusa-utils';
-import { Client, IAccount } from '@massalabs/massa-web3';
+import { Client } from '@massalabs/massa-web3';
 import { findBestTrade } from './swap';
 import * as path from 'path';
 import { config } from 'dotenv';
@@ -89,6 +87,7 @@ export async function profitability(
       console.log('amountIn is negative');
       removedAmountIn = new TokenAmount(tokenX, removedAmountIn.raw * -1n);
     }
+    // TODO: refactor: get the active bin price instead of simulate a swap
     const { bestTrade } = await findBestTrade(
       client,
       inputToken,
